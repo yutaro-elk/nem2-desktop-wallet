@@ -11,7 +11,7 @@
       </div>
       <div class="checkPWDialogBody">
         <div class="stepItem1">
-          <div v-if="isOnlyCheckPassword">
+          <div v-if="!Object.values(transactionDetail).length">
             <div class="checkPWImg">
               <img src="@/common/img/window/checkPW.png">
             </div>
@@ -36,6 +36,7 @@
             <input v-model="walletInputInfo.password" type="password" required
                    :placeholder="$t('please_enter_your_wallet_password')"/>
             <Button type="success" @click="checkPassword">{{$t('confirm')}}</Button>
+            <input v-show="false">
           </form>
         </div>
       </div>

@@ -56,7 +56,7 @@ export class AccountImportMnemonicTs extends Vue {
             })
             return false
         }
-        if (!this.form.mnemonic || this.form.mnemonic === '' || this.form.mnemonic.split(' ').length != 12) {
+        if (!this.form.mnemonic || this.form.mnemonic === '' || this.form.mnemonic.split(' ').length != 24) {
             this.$Notice.error({
                 title: this.$t(Message.MNENOMIC_INPUT_ERROR) + ''
             })
@@ -65,6 +65,7 @@ export class AccountImportMnemonicTs extends Vue {
         return true
     }
 
+    // TODO USE ACCOUNT NETWORK TYPE
     importWallet(password) {
         const {walletName, mnemonic, networkType} = this.form
         try {

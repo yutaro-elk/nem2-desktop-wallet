@@ -82,10 +82,7 @@ export class WalletSwitchTs extends Vue {
     }
 
     switchWallet(newActiveWalletAddress) {
-        this.$store.commit(
-            'SET_WALLET',
-            this.walletList.find(({address}) => address === newActiveWalletAddress)
-        )
+        AppWallet.updateActiveWalletAddress(newActiveWalletAddress, this.$store)
     }
 
     formatNumber(number) {
@@ -111,22 +108,23 @@ export class WalletSwitchTs extends Vue {
         const {accountName} = this
         const walletList = JSON.parse(localRead('accountMap'))[accountName].wallets
         // get sorted path list
-        const seedPathList = walletList.filter(item => item.path).map(item => item.path.substr(-1)).sort()
+        const seedPathList = walletList.filter(item => item.path).map(item => item.path[item.path.length - 2]).sort()
         // check if seed wallets > 10
+        console.log(seedPathList)
         if (seedPathList.length > networkConfig.seedWalletMaxAmount) {
             this.showErrorDialog(Message.SEED_WALLET_OVERFLOW_ERROR)
             return
         }
         //get min path to create
-        let pathToCreate = 0
+        let pathToCreate = '0'
         // check if there is a jump number
         const flag = seedPathList.every((item, index) => {
             if (item == index) return true
-            pathToCreate = index
+            pathToCreate = `${index}`
             return false
         })
         pathToCreate = flag ? seedPathList.length : pathToCreate
-        this.pathToCreate = `m/44'/43'/0'/0/` + pathToCreate
+        this.pathToCreate = `m/44'/43'/0'/0'/${pathToCreate}'`
         this.showCheckPWDialog = true
     }
 
@@ -136,7 +134,7 @@ export class WalletSwitchTs extends Vue {
         const currentNetType = JSON.parse(localRead('accountMap'))[accountName].currentNetType
         try {
             new AppWallet().createFromPath(
-                'seedWallet-' + pathToCreate.substr(-1),
+                'seedWallet-' + pathToCreate[pathToCreate.length - 2],
                 new Password(password),
                 pathToCreate,
                 currentNetType,
@@ -151,6 +149,6 @@ export class WalletSwitchTs extends Vue {
     mounted() {
         // scroll to current wallet
         this.$refs.walletScroll["scrollTop"] = this.walletList
-                .findIndex(({address}) => address === this.activeAddress) * 40
+            .findIndex(({address}) => address === this.activeAddress) * 40
     }
 }

@@ -261,7 +261,11 @@ export class LineChartTs extends Vue {
     }
 
     refreshXem() {
-        this.dom = echarts.init(this.$refs.dom)
+        try {
+            this.dom = echarts.init(this.$refs.dom)
+        } catch (e) {
+            return
+        }
         let {xemDataList, btcDataList} = this
         let xAxisData = []
 
@@ -299,7 +303,11 @@ export class LineChartTs extends Vue {
     }
 
     refreshBtc() {
-        this.dom = echarts.init(this.$refs.dom)
+        try {
+            this.dom = echarts.init(this.$refs.dom)
+        } catch (e) {
+            return
+        }
         let {btcDataList, xemMin} = this
         let xAxisData = []
 
@@ -372,17 +380,24 @@ export class LineChartTs extends Vue {
             })
             return
         }
-        this.btcDataList = (JSON.parse(localRead('marketPriceDataObject'))).btc.dataList
-        this.xemDataList = (JSON.parse(localRead('marketPriceDataObject'))).xem.dataList
+        const btcData = (JSON.parse(localRead('marketPriceDataObject'))).btc
+        const xemData = (JSON.parse(localRead('marketPriceDataObject'))).xem
+        this.btcDataList = btcData ? btcData.dataList : []
+        this.xemDataList = xemData ? xemData.dataList : []
     }
 
     mouseoutLine() {
         if (this.dom.dispatchAction === undefined) return
-        this.dom.dispatchAction({
-            type: 'showTip',
-            seriesIndex: 0,
-            dataIndex: this.option.series[1].data.length - 1,
-        })
+        try {
+            this.dom.dispatchAction({
+                type: 'showTip',
+                seriesIndex: 0,
+                dataIndex: this.option.series[1].data.length - 1,
+            })
+        } catch (e) {
+            return
+
+        }
     }
 
     async mounted() {

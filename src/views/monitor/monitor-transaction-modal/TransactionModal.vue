@@ -5,7 +5,7 @@
             v-if="activeTransaction"
             :title="$t('transaction_detail')"
             :transfer="false"
-            class-name="dash_board_dialog scroll"
+            class-name="dash_board_dialog scroll text_select"
     >
       <div class="transfer_type ">
         <span class="title">{{$t('transfer_type')}}</span>
@@ -19,15 +19,30 @@
                 :key="key"
                 class="other_info"
         >
-          <div v-if="key !== 'transfer_type' && key !== 'mosaic'">
+          <div v-if="key !== 'transfer_type' && !(key in SpecialTxDetailsKeys)">
             <span class="title">{{$t(key)}}</span>
-            <span class="value overflow_ellipsis">{{value}}</span>
-          </div>
-          <div v-if="key === 'mosaic'">
-            <span class="title">{{$t(key)}}</span>
-            <span class="value overflow_ellipsis">
-              {{renderMosaics(value, $store)}}
+            <span class="value overflow_ellipsis text_select" v-if="value">
+              {{key in TxDetailsKeysWithValueToTranslate ? $t(value) : value }}
             </span>
+
+            <span class="no_data" v-else>{{$t('no_data')}}</span>
+          </div>
+
+          <div class="mosaic_info" v-if="key === SpecialTxDetailsKeys.mosaics">
+            <span class="title">{{$t(key)}}</span>
+            <MosaicTable :tableData="renderMosaicsToTable(value)" />
+          </div>
+
+          <div class="mosaic_info" v-if="key === SpecialTxDetailsKeys.cosignatories">
+            <CosignatoriesTable :cosignatories="value" />
+          </div>
+            <!-- @MODAL: Do a table for restrictions -->
+          <div class="mosaic_info" v-if="key === SpecialTxDetailsKeys.namespace">
+            <span class="title">{{$t(key)}}</span>
+            <span class="value overflow_ellipsis" v-if="value">
+              {{ getNamespaceNameFromNamespaceId(value, $store) }}
+            </span>
+            <span class="no_data" v-else>{{$t('no_data')}}</span>
           </div>
         </div>
         <!-- inner transaction -->
@@ -64,22 +79,33 @@
       <div>
         <div
                 v-for="(value, key) in currentInnerTransaction.dialogDetailMap"
-                class="other_info"
                 :key="key"
+                class="other_info"
         >
-          <div v-if="key !== 'transfer_type' && key !== 'mosaic'">
+          <div v-if="key !== 'transfer_type' && !(key in SpecialTxDetailsKeys)">
             <span class="title">{{$t(key)}}</span>
-            <span class="value overflow_ellipsis">{{value}}</span>
-          </div>
-          <div v-if="key === 'mosaic'">
-            <span class="title">{{$t(key)}}</span>
-            <span class="value overflow_ellipsis">
-              <span v-for="(r, index) in renderMosaics(value, $store)" :key="index">
-                <span :class="[r.ownerPublicKey == publicKey?'green':'','mosaic_item']">
-                  {{r.name}} [{{r.amount}}]
-                </span>
-              </span>
+            <span class="value overflow_ellipsis" v-if="value">
+              {{key in TxDetailsKeysWithValueToTranslate ? $t(value) : value }}
             </span>
+            <span class="no_data" v-else>{{$t('no_data')}}</span>
+          </div>
+
+          <div class="mosaic_info" v-if="key === SpecialTxDetailsKeys.mosaics">
+            <span class="title">{{$t(key)}}</span>
+            <MosaicTable :tableData="renderMosaicsToTable(value)" />
+          </div>
+
+          <div class="mosaic_info" v-if="key === SpecialTxDetailsKeys.cosignatories">
+            <span class="title">{{$t(key)}}</span>
+            <CosignatoriesTable :cosignatories="value" />
+          </div>
+            <!-- @MODAL: Do a table for restrictions -->
+          <div class="mosaic_info" v-if="key === SpecialTxDetailsKeys.namespace">
+            <span class="title">{{$t(key)}}</span>
+            <span class="value overflow_ellipsis" v-if="value">
+              {{ getNamespaceNameFromNamespaceId(value, $store) }}
+            </span>
+            <span class="no_data" v-else>{{$t('no_data')}}</span>
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
-import {Transaction, MultisigAccountInfo} from 'nem2-sdk';
-import {AppNamespace} from './AppNamespace';
-import {AppMosaic} from './AppMosaic';
-import {FormattedTransaction} from './FormattedTransaction';
-import {ChainStatus, AppWallet} from '.';
+import {Transaction, MultisigAccountInfo} from 'nem2-sdk'
+import {AppNamespace} from './AppNamespace'
+import {AppMosaic} from './AppMosaic'
+import {FormattedTransaction} from './FormattedTransaction'
+import {ChainStatus, AppWallet} from '.'
 
 export interface AddressAndTransaction {
-  address: string
-  transaction: Transaction
+    address: string
+    transaction: Transaction
 }
 
 export interface AddressAndNamespaces {
@@ -47,6 +47,7 @@ export interface StoreAccount {
     multisigAccountsNamespaces: Record<string, AppNamespace[]>,
     multisigAccountsTransactions: Record<string, Transaction[]>,
     multisigAccountInfo: Record<string, MultisigAccountInfo>,
+    activeWalletAddress: string
     /**
      *  The network currency, to be used for fees management,
      *  formatting, defaulting...
@@ -91,4 +92,18 @@ export interface Endpoint {
     name: string,
     url: string,
     isSelected: boolean
+}
+
+/**
+ * These keys will be handled in a specific way by the transaction detail modal component
+ */
+export enum SpecialTxDetailsKeys {
+    mosaics = 'mosaics',
+    namespace = 'namespace',
+    cosignatories = 'cosignatories',
+}
+
+export enum TxDetailsKeysWithValueToTranslate {
+    action = 'action',
+    direction = 'direction',
 }
