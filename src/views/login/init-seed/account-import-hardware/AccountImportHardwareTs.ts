@@ -5,6 +5,7 @@ import {networkTypeConfig} from '@/config/view/setting'
 import trezor from '@/core/utils/trezor';
 import { Address } from 'nem2-sdk';
 import {AppInfo, StoreAccount, AppWallet} from '@/core/model'
+import {cloneData} from "@/core/utils"
 
 @Component({
     computed: {
@@ -22,13 +23,12 @@ export class AccountImportHardwareTs extends Vue {
     showCheckPWDialog = false
     // TODO: prefill values (account Index and wallet name)
     // based on number of existing trezor accounts
-    trezorForm = formDataConfig.trezorImportForm
+    trezorForm = cloneData(formDataConfig.trezorImportForm)
 
     toWalletDetails() {
         this.$Notice.success({
             title: this['$t']('Imported_wallet_successfully') + ''
         })
-        this.$store.commit('SET_HAS_WALLET', true)
         this.$router.push('dashBoard')
     }
 

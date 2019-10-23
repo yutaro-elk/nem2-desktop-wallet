@@ -1,13 +1,12 @@
 import {AppInfo, ChainStatus, AppState} from '@/core/model'
-import {localRead} from "@/core/utils";
-import {MutationTree} from 'vuex';
+import {localRead} from "@/core/utils"
+import {MutationTree} from 'vuex'
 
 const state: AppInfo = {
     timeZone: new Date().getTimezoneOffset() / 60,   // current time zone
     locale: 'en-US',
     walletList: [],
-    hasWallet: false,
-    isNodeHealthy: false,
+    isNodeHealthy: true,
     mnemonic: '',
     chainStatus: ChainStatus.getDefault(),
     mosaicsLoading: true,
@@ -17,20 +16,16 @@ const state: AppInfo = {
     multisigLoading: true,
     _ENABLE_TREZOR_: localRead("_ENABLE_TREZOR_") === "true",
     isUiDisabled: false,
-    uiDisabledMessage: ''
+    uiDisabledMessage: '',
 }
 
 const mutations: MutationTree<AppInfo> = {
     RESET_APP(state: AppInfo) {
-        state.hasWallet = false
         state.mnemonic = ''
         state.walletList = []
     },
     SET_WALLET_LIST(state: AppInfo, walletList: any[]): void {
         state.walletList = walletList
-    },
-    SET_HAS_WALLET(state: AppInfo, hasWallet: boolean): void {
-        state.hasWallet = hasWallet
     },
     SET_MNEMONIC(state: AppInfo, mnemonic: string): void {
         state.mnemonic = mnemonic
@@ -63,10 +58,11 @@ const mutations: MutationTree<AppInfo> = {
     SET_NAMESPACE_LOADING(state: AppInfo, namespaceLoading: boolean) {
         state.namespaceLoading = namespaceLoading
     },
-    SET_UI_DISABLED(state: AppInfo, { isDisabled, message }: { isDisabled: boolean, message: string}) {
-        state.isUiDisabled = isDisabled;
-        state.uiDisabledMessage = message;
-    }
+    SET_UI_DISABLED(state: AppInfo, {isDisabled, message}: { isDisabled: boolean, message: string }) {
+        state.isUiDisabled = isDisabled
+        state.uiDisabledMessage = message
+    },
+
 }
 
 export const appState = {state}

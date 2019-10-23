@@ -8,11 +8,11 @@ import {
 import {mapState} from "vuex"
 import {Message, DEFAULT_FEES, FEE_GROUPS, formDataConfig} from "@/config"
 import {Component, Provide, Vue, Watch} from 'vue-property-decorator'
-import CheckPWDialog from '@/common/vue/check-password-dialog/CheckPasswordDialog.vue'
+import CheckPWDialog from '@/components/check-password-dialog/CheckPasswordDialog.vue'
 import {getAbsoluteMosaicAmount, getRelativeMosaicAmount, formatAddress, cloneData} from "@/core/utils"
 import {standardFields, isAddress} from "@/core/validation"
-import {AppMosaic, AppWallet, AppInfo, StoreAccount, DefaultFee} from "@/core/model"
-import ErrorTooltip from '@/views/other/forms/errorTooltip/ErrorTooltip.vue'
+import {AppMosaic, AppWallet, AppInfo, StoreAccount, DefaultFee, MosaicNamespaceStatusType} from "@/core/model"
+import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
 import {createBondedMultisigTransaction, createCompleteMultisigTransaction} from '@/core/services'
 
 @Component({
@@ -187,12 +187,18 @@ export class TransactionFormTs extends Vue {
         // @TODO: would be better to return a loading indicator
         // instead of an empty array ([] = "no matching data" in the select dropdown)
         const {mosaics, currentHeight, multisigMosaicList, isSelectedAccountMultisig} = this
-        const mosaicMap = isSelectedAccountMultisig ? multisigMosaicList : mosaics
-        const mosaicList: any = Object.values(mosaicMap)
+
+        const mosaicList = isSelectedAccountMultisig
+            ? Object.values(multisigMosaicList).map(mosaic => {
+                if (mosaics[mosaic.hex]) return { ...mosaic, name: mosaics[mosaic.hex].name || null }
+                return mosaic
+            })
+            : Object.values(mosaics)
+
         // @TODO: refactor, make it an AppMosaic method
         return [...mosaicList]
             .filter(mosaic => mosaic.balance && mosaic.balance >= 0
-                && (mosaic.expirationHeight === 'Forever'
+                && (mosaic.expirationHeight === MosaicNamespaceStatusType.FOREVER
                     || currentHeight < mosaic.expirationHeight))
             .map(({name, balance, hex}) => ({
                 label: `${name || hex} (${balance.toLocaleString()})`,
@@ -202,6 +208,7 @@ export class TransactionFormTs extends Vue {
 
     initForm() {
         this.currentMosaic = null
+        this.currentAmount = 0
         this.formItems = cloneData(formDataConfig.transferForm)
         this.formItems.multisigPublicKey = this.accountPublicKey
         this.resetFields()

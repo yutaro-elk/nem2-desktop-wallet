@@ -2,7 +2,7 @@ import {Message} from "@/config/index.ts"
 import {formatDate} from '@/core/utils/utils.ts'
 import {blog} from "@/core/api/logicApi.ts"
 import {Component, Vue, Watch} from 'vue-property-decorator'
-import CheckPWDialog from '@/common/vue/check-password-dialog/CheckPasswordDialog.vue'
+import CheckPWDialog from '@/components/check-password-dialog/CheckPasswordDialog.vue'
 import {mapState} from "vuex"
 import {AppInfo, StoreAccount} from '@/core/model'
 @Component({
@@ -127,7 +127,7 @@ export class informationTs extends Vue {
         this.onCurrentArticleChange()
     }
 
-    switchLanguege() {
+    switchLanguage() {
         const {abbreviation} = this
         let languageNumber = 1
         switch (abbreviation) {
@@ -141,7 +141,7 @@ export class informationTs extends Vue {
         return languageNumber
     }
 
-    automaticLoadingArticla(e) {
+    automaticLoadingArticle(e) {
         const allHeight = this.$refs.listContainer['scrollHeight']
         const scrollHeight = this.$refs.listContainer['offsetHeight'] + this.$refs['listContainer']['scrollTop']
         if (allHeight <= scrollHeight) {
@@ -162,7 +162,7 @@ export class informationTs extends Vue {
         if (this.loadAllData) {
             return
         }
-        const languageNumber = this.switchLanguege()
+        const languageNumber = this.switchLanguage()
         const that = this
         const {startPage} = this
         const rstStr = await blog.list({

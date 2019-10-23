@@ -97,7 +97,7 @@ export class AppWallet {
         networkType: NetworkType,
         store: Store<AppState>): AppWallet {
         try {
-            const path = `m/44'/43'/0'/0'/0'`
+            const path = networkConfig.derivationSeedPath
             const accountName = store.state.account.accountName
             const accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
             const account = createSubWalletByPath(mnemonic, path)  // need put in configure
@@ -145,6 +145,7 @@ export class AppWallet {
 
     createFromKeystore(name: string,
                        password: Password,
+                       keystorePassword: Password,
                        keystoreStr: string,
                        networkType: NetworkType,
                        store: Store<AppState>): AppWallet {
@@ -155,7 +156,7 @@ export class AppWallet {
             const keystore = words.toString(CryptoJS.enc.Utf8)
             this.simpleWallet = JSON.parse(keystore)
             this.sourceType = CreateWalletType.keyStore
-            const {privateKey} =  this.getAccount(password)
+            const {privateKey} =  this.getAccount(keystorePassword)
             this.createFromPrivateKey(name, password, privateKey, networkType, store)
             this.addNewWalletToList(store)
             return this
@@ -216,8 +217,8 @@ export class AppWallet {
         // if wallet exists ,switch to this wallet
         const localData = accountMap[accountName].wallets
         accountMap[accountName].activeWalletAddress = newActiveWalletAddress
-        const flagWallet = localData.find(item=>newActiveWalletAddress == item.address)  // find wallet in wallet list
-        if(flagWallet) {  // if wallet existed ,switch to this wallet
+        const flagWallet = localData.find(item => newActiveWalletAddress == item.address)  // find wallet in wallet list
+        if (flagWallet) {  // if wallet existed ,switch to this wallet
             store.commit('SET_WALLET', flagWallet)
             localSave('accountMap', JSON.stringify(accountMap))
             return
@@ -244,7 +245,6 @@ export class AppWallet {
         localSave('accountMap', JSON.stringify(accountMap))
 
         if (list.length < 1) {
-            store.commit('SET_HAS_WALLET', false)
             store.commit('SET_WALLET', {})
         }
 
@@ -337,41 +337,11 @@ export class AppWallet {
         try {
             const multisigAccountInfo = await new AccountHttp(node)
                 .getMultisigAccountInfo(Address.createFromRawAddress(this.address)).toPromise()
-
             store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo})
             store.commit('SET_MULTISIG_LOADING', false)
         } catch (error) {
             store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo: null})
             store.commit('SET_MULTISIG_LOADING', false)
-        }
-    }
-
-    async getAccountBalance(store: Store<AppState>): Promise<AppWallet> {
-        try {
-            const {node, networkCurrency} = store.state.account
-
-            const accountInfo = await new AccountHttp(node)
-                .getAccountInfo(Address.createFromRawAddress(this.address))
-                .toPromise()
-
-            if (!accountInfo.mosaics.length) {
-                this.balance = 0
-                return this
-            }
-
-            const xemIndex = accountInfo.mosaics
-                .findIndex(mosaic => mosaic.id.toHex() === networkCurrency.hex)
-
-            if (xemIndex === -1) {
-                this.balance = 0
-                return this
-            }
-
-            this.balance = accountInfo.mosaics[xemIndex].amount.compact() / Math.pow(10, networkCurrency.divisibility)
-            return this
-        } catch (error) {
-            this.balance = 0
-            return this
         }
     }
 
@@ -430,12 +400,12 @@ export const saveLocalAlias = (
 }
 
 
-export const readLocalAlias = (address: string) => {
+export const readLocalAliasInAddressBook = (address: string) => {
     const addressBookData = localRead('addressBook')
     if (!addressBookData) return {}
     return JSON.parse(addressBookData)[address]
 }
-export const removeLink = (aliasObject, address) => {
+export const removeLinkInAddressBook = (aliasObject, address) => {
     const {alias, tag} = aliasObject
     const addressBook = JSON.parse(localRead('addressBook'))
     delete addressBook[address].aliasMap[alias]

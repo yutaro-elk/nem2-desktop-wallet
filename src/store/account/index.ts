@@ -1,17 +1,15 @@
 import Vue from 'vue'
 import {MutationTree} from 'vuex'
-import {Account} from 'nem2-sdk'
 import {defaultNetworkConfig} from "@/config/index"
 import {
     AddressAndTransaction, AddressAndNamespaces, AddressAndMosaics,
     AddressAndMultisigInfo, StoreAccount, AppMosaic, NetworkCurrency,
-    AppWallet, AppNamespace,
+    AppWallet, AppNamespace, FormattedTransaction,
 } from '@/core/model'
 import {nodeListConfig} from "@/config/view/node"
 
 const state: StoreAccount = {
     node: nodeListConfig.find((node) => node.isSelected).value,
-    account: {},
     wallet: null,
     mosaics: {},
     namespaces: [],
@@ -27,7 +25,7 @@ const state: StoreAccount = {
     multisigAccountInfo: {},
     networkCurrency: defaultNetworkConfig.defaultNetworkMosaic,
     networkMosaics: {},
-    activeWalletAddress: ''
+    activeWalletAddress: '',
 }
 
 const updateMosaics = (state: StoreAccount, mosaics: AppMosaic[]) => {
@@ -41,16 +39,12 @@ const updateMosaics = (state: StoreAccount, mosaics: AppMosaic[]) => {
 
 const mutations: MutationTree<StoreAccount> = {
     RESET_ACCOUNT(state: StoreAccount) {
-        state.account = {}
         state.wallet = null
         state.mosaics = {}
         state.namespaces = []
         state.addressAliasMap = {}
         state.transactionList = []
         state.accountName = ''
-    },
-    SET_ACCOUNT(state: StoreAccount, account: Account): void {
-        state.account = account
     },
     SET_WALLET(state: StoreAccount, wallet: AppWallet): void {
         state.wallet = wallet
@@ -83,8 +77,26 @@ const mutations: MutationTree<StoreAccount> = {
     SET_NETWORK_CURRENCY(state: StoreAccount, mosaic: NetworkCurrency) {
         state.networkCurrency = mosaic
     },
-    SET_NAMESPACES(state: StoreAccount, namespaces: AppNamespace[]): void {
-        state.namespaces = namespaces
+    RESET_NAMESPACES(state: StoreAccount): void {
+        state.namespaces = []
+    },
+    UPDATE_NAMESPACES(state: StoreAccount, namespaces: AppNamespace[]): void {
+        const namespacesToUpdate = [...state.namespaces]
+        const updatedNamespaces =  namespaces.map(newNamespace => {
+            const oldNamespace = namespacesToUpdate.find(({hex}) => hex === newNamespace.hex)
+            if (oldNamespace === undefined) return newNamespace
+            return AppNamespace.fromNamespaceUpdate(oldNamespace, newNamespace)
+        })       
+        state.namespaces = updatedNamespaces
+    },
+    ADD_NAMESPACE_FROM_RECIPIENT_ADDRESS(state: StoreAccount, namespaces: AppNamespace[]) {
+        const namespacesToUpdate = [...state.namespaces]
+        const updatedNamespaces =  namespaces.map(newNamespace => {
+            const oldNamespace = namespacesToUpdate.find(({hex}) => hex === newNamespace.hex)
+            if (oldNamespace === undefined) return newNamespace
+            return oldNamespace
+        })   
+        state.namespaces = [...state.namespaces, ...namespaces]
     },
     SET_NODE(state: StoreAccount, node: string): void {
         state.node = node
@@ -101,7 +113,7 @@ const mutations: MutationTree<StoreAccount> = {
     SET_WALLET_BALANCE(state: StoreAccount, balance: number) {
         state.wallet.balance = balance
     },
-    SET_TRANSACTION_LIST(state: StoreAccount, list: any[]) {
+    SET_TRANSACTION_LIST(state: StoreAccount, list: FormattedTransaction[]) {
         state.transactionList = list
     },
     ADD_UNCONFIRMED_TRANSACTION(state: StoreAccount, txList: any) {

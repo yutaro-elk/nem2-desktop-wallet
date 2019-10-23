@@ -33,7 +33,6 @@ export interface NetworkCurrency {
 
 export interface StoreAccount {
     node: string,
-    account: Account | any,
     wallet: AppWallet,
     mosaics: Record<string, AppMosaic>,
     namespaces: AppNamespace[],
@@ -63,7 +62,6 @@ export interface AppInfo {
     timeZone: number,
     locale: string,
     walletList: AppWallet[]
-    hasWallet: boolean,
     isNodeHealthy: boolean,
     mnemonic: string,
     chainStatus: ChainStatus,
@@ -94,6 +92,17 @@ export interface Endpoint {
     isSelected: boolean
 }
 
+export enum ANNOUNCE_TYPES {
+    NORMAL = 'NORMAL',
+    AGGREGATE_BONDED = 'AGGREGATE_BONDED',
+    AGGREGATE_COMPLETE = 'AGGREGATE_COMPLETE',
+}
+
+export enum MULTISIG_FORM_MODES {
+    CONVERSION = 'CONVERSION',
+    MODIFICATION = 'MODIFICATION',
+}
+
 /**
  * These keys will be handled in a specific way by the transaction detail modal component
  */
@@ -101,6 +110,8 @@ export enum SpecialTxDetailsKeys {
     mosaics = 'mosaics',
     namespace = 'namespace',
     cosignatories = 'cosignatories',
+    from = 'from',
+    aims = 'aims',
 }
 
 export enum TxDetailsKeysWithValueToTranslate {
