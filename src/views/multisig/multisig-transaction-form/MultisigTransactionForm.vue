@@ -1,5 +1,5 @@
 <template>
-  <div class="multisig_form_container">
+  <div class="multisig_form_container" @keyup.enter="submit">
 
     <div class="left_form radius scroll">
       <div
@@ -12,6 +12,8 @@
               v-if="displayForm"
               class="multisig_convert_container secondary_page_animate"
       >
+        <DisabledForms />
+
         <div class="multisig_convert_head">{{ $t(formHeadline) }}</div>
         <div class="convert_form">
           <div
@@ -40,7 +42,9 @@
               {{$t('Add_co_signers_here_will_be_displayed_in_the_action_list_click_delete_to_cancel_the_operation')}}
             </div>
             <div class="input_content">
-              <input v-model="publicKeyToAdd" type="text" class="radius"
+              <input v-model="publicKeyToAdd"
+                     v-focus
+                     type="text" class="radius"
                      :placeholder="$t('Input_account_public_key')">
               <span
                       @click="addCosigner(CosignatoryModificationAction.Add)"
@@ -101,7 +105,7 @@
               <div class="list_head">
                 <span class="address_alias">{{$t('publicKey')}}/{{$t('alias')}}</span>
                 <span class="action">{{$t('operating')}}</span>
-                <span class="delate">{{$t('delete')}}</span>
+                <span class="delete">{{$t('delete')}}</span>
               </div>
               <div class="list_body scroll">
                 <div class="please_add_address" v-if="formItems.publicKeyList.length == 0">
@@ -114,7 +118,7 @@
                 {{ i.modificiationType == CosignatoryModificationAction.Add
                   ? $t('add'):$t('cut_back') }}
               </span>
-                  <img class="delate pointer" @click="removeCosigner(index)"
+                  <img class="delete pointer" @click="removeCosigner(index)"
                        src="@/common/img/service/multisig/multisigDelete.png" alt="">
                 </div>
               </div>
@@ -134,29 +138,13 @@
                 @checkEnd="checkEnd"
                 :transactionDetail="transactionDetail"
                 :transactionList="transactionList"
-                :otherDetails=otherDetails
+                :lockParams=lockParams
         ></CheckPWDialog>
       </div>
     </div>
 
-    <div class="right_multisig_info radius">
-      <div>
-        <span class="green">{{$t('min_approval')}}:</span>
-        {{currentAccountMultisigInfo?currentAccountMultisigInfo.minApproval:0}}
-      </div>
-      <div>
-        <span class="green">{{$t('min_removal')}}:</span>{{currentAccountMultisigInfo?currentAccountMultisigInfo.minRemoval:0}}
-      </div>
-      <Tree
-        v-if="multisigTreeData"
-        :data="multisigTreeData"
-        @on-select-change="treeClicked"
-      />
-      <Tree
-        v-if="cosignatoryTreeData"
-        :data="cosignatoryTreeData"
-        @on-select-change="treeClicked"
-      />
+    <div class="right_multisig_info radius scroll">
+      <MultisigTree />
     </div>
 
   </div>

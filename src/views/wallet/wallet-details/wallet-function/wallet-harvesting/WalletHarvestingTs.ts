@@ -5,7 +5,7 @@ import {mapState} from "vuex"
 import {cloneData, getAbsoluteMosaicAmount} from '@/core/utils'
 import {formDataConfig} from "@/config/view/form"
 import {AppWallet, DefaultFee, StoreAccount} from "@/core/model"
-import MultisigBanCover from '@/components/multisig-ban-cover/MultisigBanCover.vue'
+import DisabledForms from '@/components/disabled-forms/DisabledForms.vue'
 import {DEFAULT_FEES, FEE_GROUPS} from "@/config/index"
 
 @Component({
@@ -15,7 +15,7 @@ import {DEFAULT_FEES, FEE_GROUPS} from "@/config/index"
     })
   },
   components:{
-    MultisigBanCover
+    DisabledForms
   }
 })
 export class WalletHarvestingTs extends Vue {
@@ -109,7 +109,7 @@ export class WalletHarvestingTs extends Vue {
             return false
         }
 
-        const validPassword = new AppWallet(this.wallet).checkPassword(new Password(password))
+        const validPassword = new AppWallet(this.wallet).checkPassword(password)
 
         if (!validPassword) {
             this.showErrorMessage(this.$t(Message.WRONG_PASSWORD_ERROR) + '')
@@ -118,7 +118,7 @@ export class WalletHarvestingTs extends Vue {
         return true
     }
 
-    confirmInput() {
+    submit() {
         if (!this.checkForm()) return
         this.sendTransaction()
     }

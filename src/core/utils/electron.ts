@@ -1,4 +1,4 @@
-import {sessionRead, sessionSave} from "@/core/utils/utils.ts"
+import {sessionRead, sessionSave} from "@/core/utils"
 
 export const openFile = (fn) => {
     const electron = window['electron']
@@ -86,9 +86,9 @@ export const closeWindow = () => {
     }
 }
 
-export const unmaximize = ()=>{
+export const unMaximize = ()=>{
     if (window['electron']) {
         const ipcRenderer = window['electron']['ipcRenderer']
-        ipcRenderer.send('app', 'unmaximize')
+        ipcRenderer.send('app', 'unMaximize')
     }
 }

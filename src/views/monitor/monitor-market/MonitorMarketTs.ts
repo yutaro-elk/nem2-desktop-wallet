@@ -1,8 +1,8 @@
 import {KlineQuery} from "@/core/query/klineQuery.ts"
-import {market} from "@/core/api/logicApi.ts"
+import {market} from "@/core/api"
 import {Component, Vue} from 'vue-property-decorator'
 import LineChart from '@/components/line-chart-by-day/LineChartByDay.vue'
-import {isRefreshData, localSave, localRead, formatDate} from '@/core/utils/utils.ts'
+import {isRefreshData, localSave, localRead, formatDate} from '@/core/utils'
 import {formatNumber} from '@/core/utils'
 
 @Component({
@@ -122,16 +122,16 @@ export class MonitorMarketTs extends Vue {
     }
 
     async getMarketOpenPrice() {
-        if (!isRefreshData('openPriceOneMinute', 1000 * 60, new Date().getSeconds())) {
-            const openPriceOneMinute = JSON.parse(localRead('openPriceOneMinute'))
-            this.currentPrice = openPriceOneMinute.openPrice
-            return
-        }
-        const that = this
-        const rstStr = await market.kline({period: "1min", symbol: "xemusdt", size: "1"})
-        if (!rstStr.rst) return
-        let rstQuery: KlineQuery
         try {
+            if (!isRefreshData('openPriceOneMinute', 1000 * 60, new Date().getSeconds())) {
+                const openPriceOneMinute = JSON.parse(localRead('openPriceOneMinute'))
+                this.currentPrice = openPriceOneMinute.openPrice
+                return
+            }
+            const that = this
+            const rstStr = await market.kline({period: "1min", symbol: "xemusdt", size: "1"})
+            if (!rstStr.rst) return
+            let rstQuery: KlineQuery
             rstQuery = JSON.parse(rstStr.rst)
             const result = rstQuery.data[0].close
             that.currentPrice = result

@@ -3,6 +3,13 @@ import {FEE_SPEEDS} from '@/config'
 
 
 export const formDataConfig = {
+    createAccountForm: {
+        accountName: '',
+        password: '',
+        passwordAgain: '',
+        hint: '',
+        currentNetType: NetworkType.MIJIN_TEST,
+    },
     importKeystoreConfig: {
         walletName: 'keystore-wallet',
         networkType: NetworkType.MIJIN_TEST,
@@ -56,7 +63,7 @@ export const formDataConfig = {
         divisibility: 0,
         transferable: true,
         supplyMutable: true,
-        permanent: false,
+        permanent: true,
         duration: 1000,
         feeSpeed: FEE_SPEEDS.NORMAL,
         multisigPublicKey: ''
@@ -104,7 +111,7 @@ export const formDataConfig = {
         walletName: 'wallet-privateKey',
     },
     trezorImportForm: {
-        networkType: 0,
+        networkType: NetworkType.MIJIN_TEST,
         accountIndex: 0,
         walletName: 'Trezor Wallet'
     }

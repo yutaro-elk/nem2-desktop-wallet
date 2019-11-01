@@ -1,62 +1,68 @@
-import {Component, Vue} from 'vue-property-decorator'
-import {
-    Account,
-    AccountHttp,
-    NetworkType,
-    TransactionHttp,
-    CosignatureTransaction,
-    AggregateTransaction,
-    Address
-} from "nem2-sdk"
+import {Component, Vue, Watch, Provide} from 'vue-property-decorator'
+import {Address} from "nem2-sdk"
 import {mapState} from "vuex"
-import {StoreAccount} from "@/core/model"
+import {StoreAccount, TRANSACTIONS_CATEGORIES} from "@/core/model"
+import {standardFields} from "@/core/validation"
+import {fetchChildrenPartialTransactions, fetchPartialTransactions} from '@/core/services/multisig/partialTransactions'
+import TransactionList from '@/components/transaction-list/TransactionList.vue'
+import MultisigTree from '@/views/multisig/multisig-tree/MultisigTree.vue'
+import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
 
-// this component is for tesing multisig
 @Component({
-    computed: {
-        ...mapState({
-            activeAccount: 'account',
-        })
-    }
+    components: { TransactionList, MultisigTree, ErrorTooltip },
+    computed: mapState({ activeAccount: 'account' }),
 })
 export class MultisigCosignTs extends Vue {
+    @Provide() validator: any = this.$validator
     activeAccount: StoreAccount
-    privatekey = ''
-    publicKey = ''
-    aggregatedTransactionList: Array<AggregateTransaction> = []
+    currentAddress = ''
+    TRANSACTIONS_CATEGORIES = TRANSACTIONS_CATEGORIES
+    standardFields = standardFields
 
-    get networkType() {
-        return this.activeAccount.wallet.networkType
+    get wallet() {
+        return this.activeAccount.wallet
     }
 
-    get generationHash() {
-        return this.activeAccount.generationHash
+    get multisigAccounts(): string[] {
+        const {multisigAccountInfo} = this.activeAccount
+        const {address, networkType} = this.wallet
+        if (!multisigAccountInfo[address]) return []
+        const multisigAccounts = multisigAccountInfo[address].multisigAccounts
+        if (!multisigAccounts.length) return []
+        return multisigAccounts
+            .map(({publicKey}) => Address.createFromPublicKey(publicKey, networkType).pretty())
     }
 
-    get node() {
-        return this.activeAccount.node
+    get targetAddress(): Address {
+        return this.currentAddress === ''
+            ? Address.createFromRawAddress(this.activeAccount.wallet.address)
+            : Address.createFromRawAddress(this.currentAddress) 
     }
 
-    get address(): Address {
-        return Address.createFromRawAddress(this.activeAccount.wallet.address) 
+    async submit() {
+        this.$validator
+            .validate()
+            .then((valid) => {
+                if (!valid) return
+                this.getCosignTransactions()
+            })
     }
 
-    async getCosignTransactions() {
-        const {address, node} = this
-        this.aggregatedTransactionList = await new AccountHttp(node)
-            .aggregateBondedTransactions(address).toPromise()
+    getCosignTransactions() {
+        fetchPartialTransactions(this.targetAddress, this.$store)
+    }
+    
+    @Watch('wallet.address')
+    onGetWalletChange(oldAddress: string, newAddress: string) {
+        if (newAddress && newAddress !== oldAddress) {
+            fetchChildrenPartialTransactions(
+                Address.createFromRawAddress(newAddress),
+                this.$store,
+            )
+        }
     }
 
-    cosignTransaction(index) {
-        const {node, privatekey} = this
-        const endpoint = node
-        const account = Account.createFromPrivateKey(privatekey, NetworkType.MIJIN_TEST)
-        const transactionHttp = new TransactionHttp(endpoint)
-        const cosignatureTransaction = CosignatureTransaction.create(this.aggregatedTransactionList[index])
-        const cosignedTx = account.signCosignatureTransaction(cosignatureTransaction)
-        transactionHttp.announceAggregateBondedCosignature(cosignedTx).subscribe((x) => {
-            console.log(x)
-        })
-        this.getCosignTransactions()
+    mounted() {
+        fetchChildrenPartialTransactions(this.targetAddress, this.$store)
     }
 }

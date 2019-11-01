@@ -1,6 +1,7 @@
 <template>
   <div class="namespaceEditDialogWrap">
     <Modal
+            @keyup.enter.native="submit"
             v-model="show"
             class-name="vertical-center-modal"
             :footer-hide="true"
@@ -10,7 +11,7 @@
       <div slot="header" class="namespaceEditDialogHeader">
         <span class="title">{{$t('update_namespace')}}</span>
       </div>
-      <MultisigBanCover></MultisigBanCover>
+      <DisabledForms></DisabledForms>
 
       <div class="namespaceEditDialogBody">
         <div class="stepItem1">
@@ -22,6 +23,7 @@
               <Input v-model="formItems.duration"
                      number
                      required
+                     :autofocus="true"
                      @input="changeXEMRentFee"
                      :placeholder="$t('enter_the_number_of_blocks_integer')" />
               <p class="tails">{{$t('validity_period')}}：{{durationIntoDate}}</p>

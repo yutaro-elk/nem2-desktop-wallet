@@ -1,11 +1,19 @@
 <template>
   <div :class="[isWindows?'windows':'mac','wrap']">
+    <div v-if="nodeNetworkType && networkType">
+      <Alert class="alert error_alert" v-if="!isNodeHealthy" type="error">
+        <Icon type="md-close"/>
+        {{$t('Node_not_available_please_check_your_node_or_network_settings')}}
+      </Alert>
 
-    <Alert class="alert" v-if="!isNodeHealthy" type="error">
-      <Icon type="ios-alert-outline"/>
-      {{$t('Node_not_available_please_check_your_node_or_network_settings')}}
-    </Alert>
+      <Alert class="alert warning_alert"
+             v-else-if="nodeNetworkType !== NetworkType[networkType] "
+             type="error">
+        <Icon type="ios-warning-outline"/>
+        {{$t('Wallet_network_type_does_not_match_current_network_type')}}
+      </Alert>
 
+    </div>
     <div class="left_navigator">
       <div class="navigator_icon">
         <div
@@ -28,7 +36,7 @@
 
       <div @click="accountQuit" class="quit_account pointer"
            v-if="walletList.length !==0">
-        <img src="@/common/img/window/windowAccoutQuit.png" alt="">
+        <img src="@/common/img/window/windowAccountQuit.png" alt="">
         <span class="account_name overflow_ellipsis">{{accountName}}</span>
       </div>
     </div>
@@ -44,7 +52,7 @@
           <div>
             <span class="pointer" @click="minWindow"></span>
             <span class="pointer not_window_max " v-if="!isNowWindowMax" @click="maxWindow"></span>
-            <span class="pointer now_window_max" v-else @click="unmaximize"></span>
+            <span class="pointer now_window_max" v-else @click="unMaximize"></span>
             <span class="pointer close_window" @click="closeWindow"></span>
           </div>
         </div>
@@ -53,7 +61,7 @@
             <Poptip placement="bottom-end">
               <i class="pointer point" @click="showNodeList = !showNodeList"/>
               <span class="network_type_text" v-if="wallet">
-                {{ networkType }}
+                {{ nodeNetworkType?NetworkType[nodeNetworkType]:$t('Loading')}}
               </span>
               <div slot="title" class="title">{{$t('current_point')}}：{{node}}</div>
               <div slot="content">
@@ -88,7 +96,7 @@
           </div>
           <div class="switch_wallet" v-if="wallet && walletList.length">
             <img class="select_wallet_icon" src="@/common/img/window/windowWalletSelect.png" alt="">
-            <i-select v-model="currentWalletAddress" :placeholder="walletList[0].name">
+            <i-select v-model="currentWalletAddress">
               <i-option v-for="(item, index) in walletList" :value="item.address" :key="index">{{ item.name }}
               </i-option>
             </i-select>

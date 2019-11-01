@@ -1,5 +1,5 @@
 import {Message} from "@/config/index.ts"
-import {copyTxt} from "@/core/utils/utils.ts"
+import {copyTxt} from "@/core/utils"
 import {Component, Vue, Prop} from 'vue-property-decorator'
 import {mapState} from "vuex"
 import {Password} from "nem2-sdk"
@@ -90,7 +90,7 @@ export class KeystoreDialogTs extends Vue {
             return false
         }
 
-        const validPassword = new AppWallet(this.getWallet).checkPassword(new Password(this.wallet.password))
+        const validPassword = new AppWallet(this.getWallet).checkPassword(this.wallet.password)
 
         if (!validPassword) {
             this.$Notice.error({

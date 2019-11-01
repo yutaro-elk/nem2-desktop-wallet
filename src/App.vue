@@ -2,6 +2,7 @@
   <div id="app" :class="[isWindows?'windows':'mac']">
     <router-view/>
     <DisabledUiOverlay/>
+    <TransactionConfirmation/>
   </div>
 </template>
 
@@ -18,17 +19,19 @@
         setMosaics, mosaicsAmountViewFromAddress, AppMosaics,
         getCurrentBlockHeight, setCurrentNetworkMosaic, getNetworkGenerationHash,
         getMarketOpenPrice, setTransactionList, setNamespaces, getNamespacesFromAddress,
-        setWalletsBalances, ChainListeners, getMultisigAccountMultisigAccountInfo,
+        setWalletsBalances, ChainListeners, getMultisigAccountMultisigAccountInfo, getNodeInfo,
     } from '@/core/services'
     import {AppMosaic, AppWallet, AppInfo, StoreAccount} from '@/core/model'
     import DisabledUiOverlay from '@/components/disabled-ui-overlay/DisabledUiOverlay.vue'
+    import TransactionConfirmation from '@/components/transaction-confirmation/TransactionConfirmation.vue'
 
     @Component({
         computed: {
             ...mapState({activeAccount: 'account', app: 'app'}),
         },
         components: {
-            DisabledUiOverlay
+            DisabledUiOverlay,
+            TransactionConfirmation
         }
     })
     export default class App extends Vue {
@@ -103,7 +106,7 @@
                 this.$store.commit('SET_NAMESPACE_LOADING', true)
                 this.$store.commit('SET_MULTISIG_LOADING', true)
                 this.$store.commit('SET_ACTIVE_MULTISIG_ACCOUNT', null)
-                this.$store.commit('SET_TRANSACTION_LIST', [])
+                this.$store.commit('RESET_TRANSACTION_LIST')
                 this.$store.commit('RESET_MOSAICS')
                 this.$store.commit('RESET_NAMESPACES')
 
@@ -118,25 +121,24 @@
                 await setMosaics(newWallet, this.$store)
                 await setNamespaces(newWallet.address, this.$store),
 
-                /**
-                 * Delay network calls to avoid ban
-                 */
-                setTimeout(() => {
-                    try {
-                        setTransactionList(newWallet.address, this.$store)
-                        appWallet.setMultisigStatus(this.node, this.$store)
-                    } catch (error) {
-                        console.error("TCL: App -> onWalletChange -> setTimeout -> error", error)
-                    }
-                }, 1000)
-
+                    /**
+                     * Delay network calls to avoid ban
+                     */
+                    setTimeout(() => {
+                        try {
+                            setTransactionList(newWallet.address, this.$store)
+                            appWallet.setMultisigStatus(this.node, this.$store)
+                        } catch (error) {
+                            console.error("TCL: App -> onWalletChange -> setTimeout -> error", error)
+                        }
+                    }, 1000)
+                getNodeInfo(this.$store)
                 if (!this.chainListeners) {
                     this.chainListeners = new ChainListeners(this, newWallet.address, this.node)
                     this.chainListeners.start()
                     this.chainListeners.startTransactionListeners()
                     return
                 }
-
                 this.chainListeners.switchAddress(newWallet.address)
             } catch (error) {
                 console.error("App -> onWalletChange -> error", error)
@@ -184,7 +186,7 @@
 
         async mounted() {
             if (!this.activeAccount.wallet) this.$router.push('/login')
-
+            getNodeInfo(this.$store)
             this.$store.commit('SET_TRANSACTIONS_LOADING', true)
             this.$store.commit('SET_MOSAICS_LOADING', true)
             this.$store.commit('SET_NAMESPACE_LOADING', true)
@@ -281,7 +283,7 @@
                     } else {
                         this.chainListeners.switchEndpoint(newValue)
                     }
-
+                    getNodeInfo(this.$store)
                     try {
                         const oldGenerationHash = this.generationHash
                         await getNetworkGenerationHash(this)

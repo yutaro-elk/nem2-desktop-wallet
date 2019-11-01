@@ -6,14 +6,11 @@ import {
     FormattedTransaction, AppInfo, StoreAccount,
     SpecialTxDetailsKeys, TxDetailsKeysWithValueToTranslate,
 } from '@/core/model'
-import {getNamespaceNameFromNamespaceId} from '@/core/services'
-import MosaicTable from './mosaic-table/MosaicTable.vue'
-import CosignatoriesTable from './cosignatories-table/CosignatoriesTable.vue'
+import TransactionSummary from '@/components/transaction-summary/TransactionSummary.vue';
 @Component({
     computed: {...mapState({activeAccount: 'account', app: 'app'})},
     components:{
-        MosaicTable,
-        CosignatoriesTable,
+        TransactionSummary,
     }
 })
 export class TransactionModalTs extends Vue {
@@ -23,7 +20,6 @@ export class TransactionModalTs extends Vue {
     currentInnerTransaction = {}
     SpecialTxDetailsKeys = SpecialTxDetailsKeys
     TxDetailsKeysWithValueToTranslate = TxDetailsKeysWithValueToTranslate
-    getNamespaceNameFromNamespaceId = getNamespaceNameFromNamespaceId
     NamespaceId = NamespaceId
 
     @Prop({default: false}) visible: boolean
@@ -54,8 +50,8 @@ export class TransactionModalTs extends Vue {
     getName(namespaceId: NamespaceId) {
         const hexId = namespaceId.toHex()
         const namespace = this.namespaces.find(({hex}) => hexId === hex)
-        if (namespace === undefined) return hexId
-        return namespace.name
+        if (namespace !== undefined) return namespace.name
+        return hexId
     }
 
     renderMosaicsToTable(mosaics){

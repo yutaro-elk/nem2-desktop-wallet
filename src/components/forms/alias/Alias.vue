@@ -1,5 +1,5 @@
 <template>
-  <div class="aliasTable">
+  <div class="aliasTable" @keyup.enter="submit">
     <Modal
            v-model="show"
            :transfer="false"
@@ -9,11 +9,11 @@
         <span class="title" v-if= bind >{{$t('bind')}}</span>
         <span class="title" v-else>{{$t('unbind')}}</span>
       </div>
-      <MultisigBanCover></MultisigBanCover>
+      <DisabledForms></DisabledForms>
       <div v-if="!bind" class="unbind_text">
         <span >{{$t('unbind')}}</span>
         <span class="color_text">{{target}}</span>
-        <span>{{$t('fromwhere')}}</span>
+        <span>{{$t('fromWhere')}}</span>
         <span class="color_text">{{alias}}</span>
       </div>
       <div v-if="bind && !fromNamespace" class="input_content">
@@ -107,7 +107,7 @@
       <div class="input_content">
         <div class="title">{{$t('password')}}</div>
         <div class="input_area">
-          <input type="password" v-model="formItems.password" :placeholder="$t('please_enter_your_wallet_password')">
+          <input v-focus type="password" v-model="formItems.password" :placeholder="$t('please_enter_your_wallet_password')">
         </div>
       </div>
 

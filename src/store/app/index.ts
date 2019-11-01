@@ -1,6 +1,7 @@
-import {AppInfo, ChainStatus, AppState} from '@/core/model'
-import {localRead} from "@/core/utils"
-import {MutationTree} from 'vuex'
+import {AppInfo, ChainStatus, LockParams, StagedTransaction} from '@/core/model'
+import {localRead} from "@/core/utils";
+import {Transaction} from 'nem2-sdk';
+import {MutationTree} from 'vuex';
 
 const state: AppInfo = {
     timeZone: new Date().getTimezoneOffset() / 60,   // current time zone
@@ -17,6 +18,12 @@ const state: AppInfo = {
     _ENABLE_TREZOR_: localRead("_ENABLE_TREZOR_") === "true",
     isUiDisabled: false,
     uiDisabledMessage: '',
+    stagedTransaction: {
+        isAwaitingConfirmation: false,
+        lockParams: LockParams.default(),
+        transactionToSign: null,
+    },
+    nodeNetworkType: ''
 }
 
 const mutations: MutationTree<AppInfo> = {
@@ -58,11 +65,16 @@ const mutations: MutationTree<AppInfo> = {
     SET_NAMESPACE_LOADING(state: AppInfo, namespaceLoading: boolean) {
         state.namespaceLoading = namespaceLoading
     },
-    SET_UI_DISABLED(state: AppInfo, {isDisabled, message}: { isDisabled: boolean, message: string }) {
-        state.isUiDisabled = isDisabled
-        state.uiDisabledMessage = message
+    SET_UI_DISABLED(state: AppInfo, { isDisabled, message }: { isDisabled: boolean, message: string}) {
+        state.isUiDisabled = isDisabled;
+        state.uiDisabledMessage = message;
     },
-
+    SET_STAGED_TRANSACTION(state: AppInfo, stagedTransaction: StagedTransaction) {
+        state.stagedTransaction = stagedTransaction
+    },
+    SET_NODE_NETWORK_TYPE(state: AppInfo, networkType: any) {
+        state.nodeNetworkType = networkType
+    },
 }
 
 export const appState = {state}

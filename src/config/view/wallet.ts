@@ -10,8 +10,8 @@ import apostille2Icon from "@/common/img/service/apostille2.png"
 import {localRead} from "@/core/utils"
 
 const _walletFnNavConfig = [
-    {name: 'create', to: '/walletCreate', active: true},
-    {name: 'import', to: '/walletImportKeystore', active: false}
+    {name: 'create', to: '/walletCreate', active: false},
+    {name: 'import', to: '/walletImportKeystore', active: true}
 ]
 
 const _walletImportNavigatorConfig = [
@@ -26,7 +26,7 @@ const _walletImportNavigatorConfig = [
     }
 ]
 
-if (localRead("_ENABLE_TREZOR_") === "true") {
+if (localRead && localRead("_ENABLE_TREZOR_") === "true") {
     _walletFnNavConfig.push({
         name: 'hardware',
         to: '/walletImportHardware',

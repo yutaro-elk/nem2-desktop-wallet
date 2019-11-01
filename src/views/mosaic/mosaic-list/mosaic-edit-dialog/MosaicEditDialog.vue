@@ -1,13 +1,14 @@
 <template>
   <div class="mosaicEditDialogWrap">
     <Modal
+            @keyup.enter.native="submit"
             v-model="show"
             class-name="vertical-center-modal"
             :footer-hide="true"
             :width="1000"
             :transfer="false"
             @on-cancel="mosaicEditDialogCancel">
-      <MultisigBanCover></MultisigBanCover>
+      <DisabledForms></DisabledForms>
       <div slot="header" class="mosaicEditDialogHeader">
         <span class="title">{{$t('modify_supply')}}</span>
       </div>
@@ -35,6 +36,7 @@
                      :disabled="!itemMosaic.properties.supplyMutable"
                      :placeholder="$t('please_enter_the_amount_of_change')"
                      @input="changeSupply"
+                     :autofocus="true"
               />
             </FormItem>
             <FormItem :label="$t('post_change_supply')">

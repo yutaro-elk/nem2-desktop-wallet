@@ -1,7 +1,7 @@
 import {TransactionType} from 'nem2-sdk'
 import {DefaultFee, NetworkCurrency} from '@/core/model'
 
-export const WALLET_VERSION = '0.8.4'
+export const WALLET_VERSION = '0.8.5'
 
 export const isWindows = require('./packge.ts').isWin32
 
@@ -46,7 +46,6 @@ export const Message = {
     NODE_CONNECTION_SUCCEEDED: 'Node_connection_succeeded',
     PLEASE_ENTER_A_CORRECT_NUMBER: 'Please_enter_a_correct_number',
     NOTES_SHOULD_NOT_EXCEED_25_CHARACTER: 'Notes_should_not_exceed_25_character',
-
     PLEASE_SET_WALLET_PASSWORD_INFO: 'please_set_your_wallet_password',
     PLEASE_ENTER_MNEMONIC_INFO: 'Please_enter_a_mnemonic_to_ensure_that_the_mnemonic_is_correct',
     PLEASE_SWITCH_NETWORK: 'walletCreateNetTypeRemind',
@@ -104,6 +103,9 @@ export const Message = {
     LOADING:'Loading',
     CLICK_TO_LOAD: 'click_to_load',
     REFRESH_TOO_FAST_WARNING:'refresh_too_fast_warning',
+    NO_NETWORK_CURRENCY: 'no_network_currency_alert',
+    MULTISIG_ACCOUNTS_NO_TX: "Multisig_accounts_can_not_send_a_transaction_by_themselves",
+    USER_ABORTED_TX_CONFIRMATION: 'User_aborted_transaction_confirmation',
 }
 
 export const FEE_SPEEDS: Record<string, string> = {
@@ -129,19 +131,19 @@ export const MULTISIG_INFO: Record<string, string> = {
 }
 export const DEFAULT_FEES: Record<string, DefaultFee[]> = {
     [FEE_GROUPS.SINGLE]: [
-        {speed: FEE_SPEEDS.SLOW, value: 0.5},
-        {speed: FEE_SPEEDS.NORMAL, value: 1},
-        {speed: FEE_SPEEDS.FAST, value: 2},
+        {speed: FEE_SPEEDS.SLOW, value: 0.05},
+        {speed: FEE_SPEEDS.NORMAL, value: 0.1},
+        {speed: FEE_SPEEDS.FAST, value: 1},
     ],
     [FEE_GROUPS.DOUBLE]: [
-        {speed: FEE_SPEEDS.SLOW, value: 1},
-        {speed: FEE_SPEEDS.NORMAL, value: 2},
-        {speed: FEE_SPEEDS.FAST, value: 3},
+        {speed: FEE_SPEEDS.SLOW, value: 0.1},
+        {speed: FEE_SPEEDS.NORMAL, value: 0.2},
+        {speed: FEE_SPEEDS.FAST, value: 2},
     ],
     [FEE_GROUPS.TRIPLE]: [
-        {speed: FEE_SPEEDS.SLOW, value: 1.5},
-        {speed: FEE_SPEEDS.NORMAL, value: 3},
-        {speed: FEE_SPEEDS.FAST, value: 6},
+        {speed: FEE_SPEEDS.SLOW, value: 0.3},
+        {speed: FEE_SPEEDS.NORMAL, value: 0.9},
+        {speed: FEE_SPEEDS.FAST, value: 3},
     ],
 }
 
@@ -199,7 +201,7 @@ export const networkConfig = {
     maxNamespaceDepth: 3,
     minNamespaceDuration: "1m",
     maxNamespaceDuration: "365d",
-    namespaceGracePeriodDuration: 156000,//s
+    namespaceGracePeriodDuration: 172800, // Blocks
     reservedRootNamespaceNames: ["xem", "nem", "user", "account", "org", "com", "biz", "net", "edu", "mil", "gov", "info"],
     namespaceRentalFeeSinkPublicKey: "3E82E1C1E4A75ADAA3CBA8C101C3CD31D9817A2EB966EB3B511FB2ED45B8E262",
     rootNamespaceRentalFeePerBlock: 1000000,
@@ -212,6 +214,4 @@ export const networkConfig = {
     seedWalletMaxAmount: 10,
     testMnemonicString: 'this is a test string his is a test string this is',
     EMPTY_LINKED_ACCOUNT_KEY: '0000000000000000000000000000000000000000000000000000000000000000',
-    derivationPathHead:`m/44'/43'/0'/0'/`,
-    derivationSeedPath:`m/44'/43'/0'/0'/0'`
 }

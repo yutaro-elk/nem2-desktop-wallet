@@ -16,7 +16,7 @@
           <span class="amount">{{formatNumber(balance)}}</span>
         </div>
         <div class="exchange">
-          ${{formatNumber(balance*xemUsdPrice)}}
+          {{ xemUsdPrice > 0 ? `$${formatNumber(balance*xemUsdPrice)}` : '' }}
         </div>
       </div>
       <div class="bottom_account_info radius" ref="bottomAccountInfo">
@@ -83,7 +83,7 @@
                 </span>
                 <span class="mosaic_name text_select">{{mosaic.name || mosaic.hex}}</span>
                 <span class="mosaic_value">
-                  <div>{{mosaic.balance}}</div>
+                  <div>{{formatNumber(mosaic.balance || 0)}}</div>
                 </span>
               </div>
               <div class="complete_container">
@@ -98,12 +98,16 @@
     <div class="monitor_panel_right_container">
       <div class="top_navidator radius">
         <span
-                :class="[n.isSelect?'active_navigator':'','outter_container',n.disabled?'disabled':'pointer']"
-                @click="switchPanel(index)"
-                v-for="(n,index) in navigatorList"
+                v-for="({path, name, active}, index) in routes"
                 :key="index"
+                :class="[
+                    active ? 'active_navigator' : '',
+                    'outter_container',
+                    active ? 'disabled' : 'pointer'
+                ]"
+                @click="$router.push(path)"
         >
-          <span class="inner_container absolute">{{$t(n.name)}}</span>
+          <span class="inner_container absolute">{{$t(name)}}</span>
           <span class="line">|</span>
         </span>
       </div>
