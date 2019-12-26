@@ -1,5 +1,5 @@
 import {leftBarIcons} from '@/common/img/window'
-import {createStepImage,importStepImage} from '@/config/view/login'
+import {createStepImage, importStepImage, importLedgerStepImage} from '@/config/view/login'
 
 const routers = [
     {
@@ -304,6 +304,23 @@ const routers = [
                             name: 'finishImport',
                             meta: {icon: importStepImage.importStepImage4},
                             component: () => import('@/views/login/import-account/finish-import/FinishImport.vue'),
+                        }],
+                    },
+                    {
+                        path: '/importLedgerAccount',
+                        name: 'importLedgerAccount',
+                        redirect: '/inputLedgerAccountInfo',
+                        component: () => import('@/views/login/import-account/ImportAccount.vue'),                         
+                        children: [{
+                            path: '/inputLedgerAccountInfo',
+                            name: 'inputLedgerAccountInfo',
+                            meta: {index: 1, isLedger: true, icon: importLedgerStepImage.importLedgerStepImage1},
+                            component: () => import('@/views/login/import-account/create-account-info/CreateAccountInfo.vue'),
+                        }, {
+                            path: '/importLedger',
+                            name: 'importLedger',
+                            meta: {index: 2, isLedger: true, icon: importLedgerStepImage.importLedgerStepImage2},
+                            component: () => import('@/views/wallet/wallet-functions/wallet-import/wallet-import-ledger/WalletImportLedger.vue'),
                         }],
                     },
                 ]

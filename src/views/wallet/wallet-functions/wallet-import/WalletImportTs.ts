@@ -4,6 +4,7 @@ import WalletImportKeystore
 import WalletImportPrivatekey
     from '@/views/wallet/wallet-functions/wallet-import/wallet-import-privatekey/WalletImportPrivatekey.vue'
 import WalletImportHardware from '@/views/wallet/wallet-functions/wallet-import/wallet-import-hardware/WalletImportHardware.vue'
+import WalletImportLedger from '@/views/wallet/wallet-functions/wallet-import/wallet-import-ledger/WalletImportLedger.vue'
 import {walletImportNavigatorConfig} from '@/config/view/wallet'
 
 @Component({
@@ -11,6 +12,7 @@ import {walletImportNavigatorConfig} from '@/config/view/wallet'
         WalletImportKeystore,
         WalletImportPrivatekey,
         WalletImportHardware,
+        WalletImportLedger,
     },
 })
 export class WalletImportTs extends Vue {

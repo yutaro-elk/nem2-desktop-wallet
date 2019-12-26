@@ -173,6 +173,30 @@ export class AppWallet {
         }
     }
 
+    createFromLedger(
+        name: string,
+        networkType: NetworkType,
+        path: string,
+        publicKey: string,
+        address: string,
+        store: Store<AppState>): AppWallet {
+        try {
+            const accountMap = localRead('accountMap') === '' ? {} : JSON.parse(localRead('accountMap'))
+            this.name = name
+            this.address = address
+            this.publicKey = publicKey
+            this.networkType = networkType
+            this.active = true
+            this.path = path
+            this.sourceType = CreateWalletType.ledger
+            localSave('accountMap', JSON.stringify(accountMap))
+            this.addNewWalletToList(store)
+            return this
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+
     createFromKeystore(name: string,
                        password: Password,
                        keystorePassword: Password,

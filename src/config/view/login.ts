@@ -13,6 +13,8 @@ import createStepImage3 from '@/common/img/login/3_5.png'
 import createStepImage4 from '@/common/img/login/4_5.png'
 import createStepImage5 from '@/common/img/login/5_5.png'
 
+import importLedgerStepImage1 from '@/common/img/login/1_2.png'
+import importLedgerStepImage2 from '@/common/img/login/2_2.png'
 
 export const importInfoList = [
     {
@@ -31,7 +33,7 @@ export const importInfoList = [
         image: ledgerImg,
         title: "Access_Ledger",
         description: "Access_your_ledger_wallet_to_make_ledge_account",
-        link: null,
+        link: "importLedgerAccount",
     }
 ]
 
@@ -50,6 +52,11 @@ export const importStepBarTitleList = [
     'Finished'
 ]
 
+export const importLedgerStepBarTitleList = [
+    'Create Account',
+    'Import Ledger Account'
+]
+
 export const importStepImage = {
     importStepImage1,
     importStepImage2,
@@ -63,4 +70,9 @@ export const createStepImage = {
     createStepImage3,
     createStepImage4,
     createStepImage5,
+}
+
+export const importLedgerStepImage = {
+    importLedgerStepImage1,      
+    importLedgerStepImage2,
 }

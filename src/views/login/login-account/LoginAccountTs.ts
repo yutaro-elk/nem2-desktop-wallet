@@ -121,12 +121,20 @@ export default class LoginAccountTs extends Vue {
         return
     }
 
+    isNotHardwareWallet(wallet : any): boolean {
+        if (wallet.sourceType !== "Ledger") {
+            return true
+        }
+        return false
+    }
+
     noSeedAvailable(): boolean {
         const {currentAccountName} = this.formItems
         if (!currentAccountName || currentAccountName === '') return true
         if (!this.accountMap) return true
         if (!this.accountMap[currentAccountName]) return true
-        if (!this.accountMap[currentAccountName].seed) return true
+        if (!this.accountMap[currentAccountName].seed 
+            && this.accountMap[currentAccountName].wallets.every(this.isNotHardwareWallet)) return true
         return false
     }
 

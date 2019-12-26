@@ -20,11 +20,16 @@ export class CreateAccountInfoTs extends Vue {
     formItem = cloneData(formDataConfig.createAccountForm)
     currentNetworkType = getDefaultAccountNetworkType()
     networkTypeList = networkTypeConfig
+    isLedger = false
+
+    created() {
+        const {isLedger} = this.$route.meta
+        this.isLedger = isLedger
+    }
 
     get accountName() {
         return this.activeAccount.currentAccount.name
     }
-
 
     checkInput() {
         const {currentNetworkType} = this
@@ -69,6 +74,6 @@ export class CreateAccountInfoTs extends Vue {
         }
         this.$store.commit('SET_ACCOUNT_DATA', currentAccount)
         this.$store.commit('SET_TEMPORARY_PASSWORD', password)
-        this.$router.push('importMnemonic')
+        this.$router.push(!this.isLedger ? 'importMnemonic' : 'importLedger')
     }
 }
