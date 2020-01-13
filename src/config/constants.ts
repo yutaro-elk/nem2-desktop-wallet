@@ -172,7 +172,6 @@ export const Message = {
   DIVISIBILITY_MORE_THAN_6_ERROR: 'divisibility_can_not_more_than_6',
   DURATION_LESS_THAN_0_ERROR: 'duration_can_not_less_than_0',
   DURATION_MORE_THAN_1_YEARS_ERROR: 'duration_can_not_more_than_1_years',
-  DURATION_MORE_THAN_10_YEARS_ERROR: 'duration_can_not_more_than_10_years',
   DURATION_VALUE_LESS_THAN_1_ERROR: 'The_value_of_duration_cannot_be_less_than_1',
   FEE_LESS_THAN_0_ERROR: 'fee_can_not_be_less_than_0',
   HD_WALLET_PATH_ERROR: 'hd_wallet_path_error',
