@@ -945,5 +945,6 @@
   "confirm_information_before_add_child_wallet": "Enter your password to create a new child wallet",
   "loading": "loading...",
   "Enter_your_password_to_create_a_link_transaction": "Enter your password to create an account link transaction",
-  "Click_to_cosign": "Click to cosign"
+  "Click_to_cosign": "Click to cosign",
+  "mosaic_duration_hint": "The duration is calculated in blocks. One block is {targetBlockTime} seconds. The maximum duration is {MAX_MOSAIC_DURATION_YEARS} years"
 }

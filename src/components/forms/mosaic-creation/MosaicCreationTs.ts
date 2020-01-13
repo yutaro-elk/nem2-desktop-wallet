@@ -17,7 +17,7 @@ import {
 import {
   formatSeconds, formatAddress, getAbsoluteMosaicAmount, cloneData,
 } from '@/core/utils'
-import {formDataConfig, Message, DEFAULT_FEES, FEE_GROUPS, networkConfig} from '@/config'
+import {formDataConfig, Message, DEFAULT_FEES, FEE_GROUPS, networkConfig, NETWORK_CONSTANTS} from '@/config'
 import {StoreAccount, AppWallet, DefaultFee, LockParams} from '@/core/model'
 import {validation} from '@/core/validation'
 import {createBondedMultisigTransaction, createCompleteMultisigTransaction, signAndAnnounce} from '@/core/services'
@@ -42,6 +42,8 @@ export class MosaicCreationTs extends Vue {
   transactionList = []
   formItems = cloneData(formDataConfig.mosaicTransactionForm)
   formatAddress = formatAddress
+  targetBlockTime = networkConfig.targetBlockTime
+  MAX_MOSAIC_DURATION_YEARS = NETWORK_CONSTANTS.MAX_MOSAIC_DURATION_YEARS
 
   get wallet(): AppWallet {
     return this.activeAccount.wallet

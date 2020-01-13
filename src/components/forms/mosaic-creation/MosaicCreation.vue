@@ -109,7 +109,7 @@
               <span class="end_label">{{ $t('duration') }}:{{ durationIntoDate }}</span>
             </span>
             <div class="tips">
-              {{ $t('namespace_duration_tip_1') }}
+              {{ $t('mosaic_duration_hint', {targetBlockTime, MAX_MOSAIC_DURATION_YEARS} ) }}
             </div>
           </div>
           <div v-if="false" class="form_item XEM_rent_fee">

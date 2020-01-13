@@ -148,6 +148,7 @@ export const NETWORK_CONSTANTS = {
   GENERATION_HASH_LENGTH: 64,
   MAX_MESSAGE_LENGTH: networkConfig.maxMessageSize - 1,
   MAX_MOSAIC_DURATION: networkConfig.maxMosaicDuration * 24 * 60 * 60 / networkConfig.targetBlockTime,
+  MAX_MOSAIC_DURATION_YEARS: networkConfig.maxMosaicDuration / 365,
   MAX_NAMESPACE_DURATION: networkConfig.maxNamespaceDuration * 24 * 60 * 60 / networkConfig.targetBlockTime,
   MIN_NAMESPACE_DURATION: 30 * 24 * 60 * 60 / networkConfig.targetBlockTime,
   PRIVATE_KEY_LENGTH: 64,
