@@ -109,20 +109,13 @@ export class MosaicCreationTs extends Vue {
   }
 
   get durationIntoDate(): string {
-    const {MAX_MOSAIC_DURATION_YEARS} = this
-    const duration = Number(this.formItems.duration)
+    const duration = parseInt(this.formItems.duration, 10)
 
     if (Number.isNaN(duration)) {
       this.formItems.duration = 0
       return ''
     }
 
-    if (duration * networkConfig.targetBlockTime >= 60 * 60 * 24 * 3650) {
-      this.$Notice.error({
-        title: `${this.$t('mosaic_max_duration_error', {MAX_MOSAIC_DURATION_YEARS})}`,
-      })
-      this.formItems.duration = 0
-    }
     return formatSeconds(duration * networkConfig.targetBlockTime)
   }
 

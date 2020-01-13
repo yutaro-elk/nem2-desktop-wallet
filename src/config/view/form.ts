@@ -1,5 +1,7 @@
 import {NetworkType, MosaicSupplyChangeAction} from 'nem2-sdk'
-import {FEE_SPEEDS, NETWORK_CONSTANTS} from '../constants'
+import {FEE_SPEEDS, NETWORK_CONSTANTS, networkConfig} from '../constants'
+const {MAX_MOSAIC_DURATION} = NETWORK_CONSTANTS
+const {maxMosaicAtomicUnits, maxMosaicDivisibility} = networkConfig
 
 export const formDataConfig = {
   settingPassword: {
@@ -57,12 +59,12 @@ export const formDataConfig = {
   },
   mosaicTransactionForm: {
     restrictable: false,
-    supply: 500000000,
-    divisibility: 0,
+    supply: maxMosaicAtomicUnits,
+    divisibility: maxMosaicDivisibility,
     transferable: true,
     supplyMutable: false,
     permanent: false,
-    duration: 1000,
+    duration: MAX_MOSAIC_DURATION,
     feeSpeed: FEE_SPEEDS.NORMAL,
     multisigPublicKey: '',
   },
