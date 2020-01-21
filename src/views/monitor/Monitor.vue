@@ -109,14 +109,14 @@
         <div class="top_wallet_info">
           <div class="netWork radius">
             <div class="title">
-              <span class="title_txt">{{ $t('nodes') }}</span>
+              <span class="title_txt overflow_ellipsis">{{ $t('nodes') }}</span>
             </div>
             <img src="@/common/img/monitor/network.png">
             <span class="txt_info"><numberGrow :value="NetworkProperties.nodeNumber" /></span>
           </div>
           <div class="block_height radius">
             <div class="title">
-              <span class="title_txt">{{ $t('blocks') }}</span>
+              <span class="title_txt overflow_ellipsis">{{ $t('blocks') }}</span>
             </div>
             <img src="@/common/img/monitor/block_height.png">
             <span class="txt_info">
@@ -125,7 +125,7 @@
           </div>
           <div class="amount radius">
             <div class="title">
-              <span class="title_txt">{{ $t('transactions') }}</span>
+              <span class="title_txt overflow_ellipsis">{{ $t('transactions') }}</span>
             </div>
             <img src="@/common/img/windowDashboardActive.png">
             <span class="txt_info">
@@ -134,9 +134,9 @@
           </div>
           <div class="block_time radius">
             <div class="title">
-              <span class="title_txt">
+              <span class="title_txt overflow_ellipsis">
                 {{ $t('time') }}
-                <span class="title_txt">
+                <span >
                   {{ NetworkProperties.getTimeFromBlockNumber(NetworkProperties.height) }}
                 </span>
               </span>

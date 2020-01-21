@@ -51,7 +51,7 @@
         class="transaction_record_item pointer"
         @click="showDialog = true; activeTransaction = c"
       >
-        <img src="@/common/img/monitor/transaction/txUnConfirmed.png" alt="">
+        <img src="../../common/img/monitor/transaction/txUnConfirmed.png">
         <div class="flex_content">
           <div class="left left_components">
             <div class="top overflow_ellipsis">
