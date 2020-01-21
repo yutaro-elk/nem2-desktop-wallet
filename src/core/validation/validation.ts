@@ -22,7 +22,7 @@ export const validation = {
   amount: 'excluded:""|is_not:0|decimal:6|min_value:0|otherField:selectedMosaic|amountDecimals:selectedMosaic|mosaicMaxAmount:selectedMosaic',
   confirmPassword: 'required|confirmPassword:newPassword',
   divisibility: `required|min_value:0|max_value:${maxMosaicDivisibility}|integer`,
-  duration: `required|min_value:0|max_value:${MAX_MOSAIC_DURATION}`,
+  duration: `required|min_value:1|max_value:${MAX_MOSAIC_DURATION}`,
   generationHash: `required|min:${GENERATION_HASH_LENGTH}|max:${GENERATION_HASH_LENGTH}`,
   invoiceAmount: `decimal:6|min_value:0|max_value:${maxMosaicAtomicUnits}`,
   mosaicId: 'required|mosaicId',
