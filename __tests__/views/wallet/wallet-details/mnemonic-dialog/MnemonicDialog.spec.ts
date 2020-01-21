@@ -8,7 +8,6 @@ import MnemonicDialog from '@/views/wallet/wallet-details/mnemonic-dialog/Mnemon
 import {accountState} from '@/store/account'
 import {veeValidateConfig} from '@/core/validation'
 import {
-  multisigAccountInfo,
   mosaics,
   networkCurrency,
   hdAccount,
@@ -47,7 +46,6 @@ describe('MnemonicDialog', () => {
             wallet: hdAccount.wallets[0],
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
             accountName: hdAccount.accountName,
           }),
         },

@@ -11,10 +11,13 @@ export const setPartialTransactions = async (
     .getAccountPartialTransactions(address)
     .subscribe(
       transactionList => {
-        transactionFormatter.formatAndSaveTransactions(transactionList, {
-          transactionStatusGroup: TransactionStatusGroups.confirmed,
-          transactionCategory: TransactionCategories.TO_COSIGN,
-        })
+        transactionFormatter.formatAndSavePartialTransactions(
+          transactionList, 
+          address,
+          {
+            transactionStatusGroup: TransactionStatusGroups.confirmed,
+            transactionCategory: TransactionCategories.TO_COSIGN,
+          })
       },
       error => console.error('setPartialTransactions', error),
     )

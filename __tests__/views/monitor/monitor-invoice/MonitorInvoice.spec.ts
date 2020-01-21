@@ -14,7 +14,6 @@ import {
 } from 'nem2-sdk'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -45,7 +44,6 @@ describe('MonitorInvoice', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
           }),
           mutations: accountMutations.mutations,
         },

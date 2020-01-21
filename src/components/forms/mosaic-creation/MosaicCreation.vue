@@ -7,10 +7,10 @@
           <div class="form_item">
             <span class="key">{{ $t('account') }}</span>
             <span
-              v-if="!hasMultisigAccounts"
+              v-if="!isCosignatory"
               class="value text_select"
             >{{ formatAddress(wallet.address) }}</span>
-            <ErrorTooltip v-if="hasMultisigAccounts" field-name="multisigPublicKey">
+            <ErrorTooltip v-if="isCosignatory" field-name="multisigPublicKey">
               <SignerSelector v-model="formItems.multisigPublicKey" />
             </ErrorTooltip>
           </div>

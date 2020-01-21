@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 import VeeValidate from 'vee-validate'
 // @ts-ignore
 import SignerSelector from '@/components/forms/inputs/signer-selector/SignerSelector.vue'
-import {accountState} from '@/store/account/index.ts'
+import {accountState, accountGetters} from '@/store/account/index.ts'
 import {appState} from '@/store/app/index.ts'
 import {veeValidateConfig} from '@/core/validation/index.ts'
 import VueRx from 'vue-rx'
@@ -16,10 +16,10 @@ import {
   mosaics,
   mosaicsLoading,
   MultisigAccount,
-  multisigAccountInfo,
   walletList,
   hdAccount,
   MultisigWallet,
+  cosignWalletMultisigAccountGraphInfo,
 } from '@MOCKS/index'
 
 // @ts-ignore
@@ -46,18 +46,21 @@ describe('SignerSelector', () => {
   beforeEach(() => {
     setActiveMultisigAccountMock = jest.fn()
 
-    store = store = new Vuex.Store({
+    store = new Vuex.Store({
       modules: {
         account: {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             currentAccount: current1Account,
+            multisigAccountGraphInfo: {
+              [CosignWallet.address]: cosignWalletMultisigAccountGraphInfo,
+            },
           }),
           mutations: {
             SET_ACTIVE_MULTISIG_ACCOUNT: setActiveMultisigAccountMock,
           },
+          getters: accountGetters.getters,
         },
         app: {
           state: {walletList},
@@ -76,18 +79,12 @@ describe('SignerSelector', () => {
   })
 
   it('should return a correct multisig public key list', async () => {
-    wrapper.setProps({value: CosignAccount.publicKey})
-
-    expect(wrapper.vm.multisigPublicKeyList).toEqual([
-      {
-        publicKey: CosignAccount.publicKey,
-        label: `${CosignAccount.address.pretty()} (CosignAccount)`,
-      },
-      {
-        publicKey: MultisigAccount.publicKey,
-        label: `${MultisigAccount.address.pretty()} (MultisigAccount)`,
-      },
-    ])
+    // wrapper.setProps({value: CosignAccount.publicKey})
+    expect(wrapper.vm.multisigPublicKeyList).toEqual({
+      '8286C52C585471A6BEAAFE07C68EA004CF2DF5EE171A88596B26054FEAF4C8BC': 'SBIWHD-WZMPIX-XM2BIN-CRXAK3-H3MGA5-VHB3D2-PO5W (Multisig2Account)',
+      'D483C074437097FC9847169528A9E04F421A7A6E49D293BFB1CD3EC995F8BF37': 'SB2FRR-M3SYAM-QL47RR-UKMQSR-JXJT3Q-PVAVWN-TXQX (MultisigAccount)',
+      'F96D892CD86878A6714CEC06B86F7A0848A0BA9A73DE8F6C77E5F20C026620DF': 'SAY7N2-GP6JJB-FIRBTU-EXY2JJ-VOLGIZ-46KWIM-YB5T (CosignAccount)',
+    })
   })
 
 
@@ -95,16 +92,6 @@ describe('SignerSelector', () => {
     wrapper.setProps({value: CosignAccount.publicKey})
     await wrapper.vm.$nextTick()
     wrapper.setData({inputValue: MultisigAccount.publicKey})
-    expect(wrapper.vm.multisigPublicKeyList).toEqual([
-      {
-        publicKey: CosignAccount.publicKey,
-        label: `${CosignAccount.address.pretty()} (CosignAccount)`,
-      },
-      {
-        publicKey: MultisigAccount.publicKey,
-        label: `${MultisigAccount.address.pretty()} (MultisigAccount)`,
-      },
-    ])
     expect(wrapper.emitted().input[1]).toEqual([MultisigAccount.publicKey])
     expect(setActiveMultisigAccountMock.mock.calls[1][1]).toEqual(MultisigAccount.publicKey)
   })
@@ -125,12 +112,12 @@ describe('SignerSelector', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             currentAccount: current1Account,
           }),
           mutations: {
             SET_ACTIVE_MULTISIG_ACCOUNT: setActiveMultisigAccountMock,
           },
+          getters: accountGetters.getters,
         },
         app: {
           state: Object.assign(appState.state, {mosaicsLoading}),
@@ -174,12 +161,12 @@ describe('SignerSelector, no wallet list in store', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             currentAccount: current1Account,
           }),
           mutations: {
             SET_ACTIVE_MULTISIG_ACCOUNT: setActiveMultisigAccountMock,
           },
+          getters: accountGetters.getters,
         },
         app: {
           state: {walletList: []},
@@ -202,16 +189,11 @@ describe('SignerSelector, no wallet list in store', () => {
   it('should return a correct multisig public key list', async () => {
     wrapper.setProps({value: CosignAccount.publicKey})
 
-    expect(wrapper.vm.multisigPublicKeyList).toEqual([
-      {
-        publicKey: CosignAccount.publicKey,
-        label: `${CosignAccount.address.pretty()}`,
-      },
-      {
-        publicKey: 'D483C074437097FC9847169528A9E04F421A7A6E49D293BFB1CD3EC995F8BF37',
-        label: 'SB2FRR-M3SYAM-QL47RR-UKMQSR-JXJT3Q-PVAVWN-TXQX',
-      },
-    ])
+    expect(wrapper.vm.multisigPublicKeyList).toEqual({ 
+      '8286C52C585471A6BEAAFE07C68EA004CF2DF5EE171A88596B26054FEAF4C8BC': 'SBIWHD-WZMPIX-XM2BIN-CRXAK3-H3MGA5-VHB3D2-PO5W',
+      'D483C074437097FC9847169528A9E04F421A7A6E49D293BFB1CD3EC995F8BF37': 'SB2FRR-M3SYAM-QL47RR-UKMQSR-JXJT3Q-PVAVWN-TXQX',
+      'F96D892CD86878A6714CEC06B86F7A0848A0BA9A73DE8F6C77E5F20C026620DF': 'SAY7N2-GP6JJB-FIRBTU-EXY2JJ-VOLGIZ-46KWIM-YB5T',
+    })
   })
 
   it('should should trigger value change when wallet changes', async () => {
@@ -239,12 +221,12 @@ describe('SignerSelector, wallet without multisig account', () => {
           state: Object.assign(accountState.state, {
             wallet: hdAccount.wallets[0],
             mosaics,
-            multisigAccountInfo,
             currentAccount: current1Account,
           }),
           mutations: {
             SET_ACTIVE_MULTISIG_ACCOUNT: setActiveMultisigAccountMock,
           },
+          getters: accountGetters.getters,
         },
         app: {
           state: {walletList: []},

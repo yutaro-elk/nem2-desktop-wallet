@@ -14,6 +14,9 @@ import {hdAccount, hdAccountData} from '@MOCKS/index'
 import flushPromises from 'flush-promises'
 import {appMutations,appState} from '@/store/app'
 
+jest.mock('@/core/services/network/Endpoints.ts')
+jest.mock('@/core/services/eventHandlers/onLogin.ts')
+
 // @ts-ignore
 const localVue = createLocalVue()
 const router = new VueRouter()
@@ -60,8 +63,7 @@ describe('LoginAccount', () => {
       store,
       router,
     })
-  },
-  )
+  })
 
   it('should save account and node info in store while password is right', async (done) => {
     wrapper.vm.$nextTick(()=>{ wrapper.vm.$validator.reset()})

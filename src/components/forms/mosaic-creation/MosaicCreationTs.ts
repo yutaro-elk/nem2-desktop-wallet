@@ -1,4 +1,4 @@
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {Component, Vue, Provide} from 'vue-property-decorator'
 import {
   MosaicId,
@@ -11,7 +11,6 @@ import {
   MosaicSupplyChangeTransaction,
   MosaicSupplyChangeAction,
   MultisigAccountInfo,
-  Address,
   NetworkType, AggregateTransaction,
 } from 'nem2-sdk'
 import {
@@ -31,6 +30,11 @@ import SignerSelector from '@/components/forms/inputs/signer-selector/SignerSele
     ...mapState({
       activeAccount: 'account',
     }),
+    ...mapGetters({
+      multisigAccountInfo: 'multisigAccountInfo',
+      isCosignatory: 'isCosignatory',
+      announceInLock: 'announceInLock',
+    }),
   },
 })
 export class MosaicCreationTs extends Vue {
@@ -38,6 +42,9 @@ export class MosaicCreationTs extends Vue {
   signAndAnnounce = signAndAnnounce
   validation = validation
   activeAccount: StoreAccount
+  multisigAccountInfo: MultisigAccountInfo
+  isCosignatory: boolean
+  announceInLock: boolean
   transactionDetail = {}
   transactionList = []
   formItems = cloneData(formDataConfig.mosaicTransactionForm)
@@ -51,23 +58,6 @@ export class MosaicCreationTs extends Vue {
 
   get activeMultisigAccount(): string {
     return this.activeAccount.activeMultisigAccount
-  }
-
-  get announceInLock(): boolean {
-    const {activeMultisigAccount, networkType} = this
-    if (!this.activeMultisigAccount) return false
-    const address = Address.createFromPublicKey(activeMultisigAccount, networkType).plain()
-    return this.activeAccount.multisigAccountInfo[address].minApproval > 1
-  }
-
-  get multisigInfo(): MultisigAccountInfo {
-    const {address} = this.wallet
-    return this.activeAccount.multisigAccountInfo[address]
-  }
-
-  get hasMultisigAccounts(): boolean {
-    if (!this.multisigInfo) return false
-    return this.multisigInfo.multisigAccounts.length > 0
   }
 
   get networkType(): NetworkType {
@@ -150,6 +140,7 @@ export class MosaicCreationTs extends Vue {
       this.signAndAnnounce({
         transaction: this.transactionList[0],
         store: this.$store,
+        lockParams: this.lockParams,
       })
     } catch (error) {
       console.error('MosaicTransactionTs -> confirmViaTransactionConfirmation -> error', error)

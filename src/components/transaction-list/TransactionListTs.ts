@@ -16,11 +16,12 @@ import NumberFormatting from '@/components/number-formatting/NumberFormatting.vu
 
 @Component({
   computed: {...mapState({activeAccount: 'account', app: 'app'})},
-  components: {TransactionModal,NumberFormatting},
+  components: {TransactionModal, NumberFormatting},
 })
 export class TransactionListTs extends Vue {
   app: AppInfo
   activeAccount: StoreAccount
+  Address = Address
   pageSize = 10
   highestPrice = 0
   isLoadingModalDetailsInfo = false
@@ -77,10 +78,18 @@ export class TransactionListTs extends Vue {
     return this.mode === TransactionCategories.TO_COSIGN
       ? 'Transactions_to_cosign'
       : 'transaction_record'
-  }
+  } 
 
   get explorerBasePath() {
     return this.app.explorerBasePath
+  }
+
+  showClickToCosign(transaction: FormattedTransaction): boolean {
+    if (this.$store.getters.isMultisig) return false
+    if (!(transaction instanceof FormattedAggregateBonded)) return false
+    if (!transaction.toCosign) return false
+    const walletAddress = Address.createFromRawAddress(this.wallet.address)
+    return !transaction.alreadyCosignedBy(walletAddress)
   }
 
   getName(namespaceId: NamespaceId) {
@@ -139,7 +148,7 @@ export class TransactionListTs extends Vue {
 
     if (this.activeTransaction.toCosign) {
       if (transaction instanceof FormattedAggregateBonded
-                && transaction.alreadyCosignedBy(Address.createFromRawAddress(this.wallet.address))) {
+        && transaction.alreadyCosignedBy(Address.createFromRawAddress(this.wallet.address))) {
         this.showDialog = true
         return
       }

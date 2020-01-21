@@ -16,7 +16,6 @@ import VueRx from 'vue-rx'
 import moment from 'vue-moment'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
   hdAccount,
@@ -71,7 +70,6 @@ describe('AppWallet', () => {
             ...Object.assign(accountState.state, {
               wallet: CosignWallet,
               mosaics,
-              multisigAccountInfo,
             }),
           },
           mutations: accountMutations.mutations,

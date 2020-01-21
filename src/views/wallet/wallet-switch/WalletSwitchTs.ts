@@ -4,7 +4,6 @@ import {formatNumber} from '@/core/utils'
 import {AppWallet, AppInfo, StoreAccount, Notice, NoticeType} from '@/core/model'
 import {CreateWalletType} from '@/core/model/CreateWalletType'
 import {walletStyleSheetType} from '@/config/view/wallet.ts'
-import {MultisigAccountInfo} from 'nem2-sdk'
 import TheWalletAdd from '@/views/wallet/wallet-switch/the-wallet-add/TheWalletAdd.vue'
 import TheWalletDelete from '@/views/wallet/wallet-switch/the-wallet-delete/TheWalletDelete.vue'
 import MnemonicDialog from '@/views/wallet/wallet-details/mnemonic-dialog/MnemonicDialog.vue'
@@ -59,13 +58,6 @@ export class WalletSwitchTs extends Vue {
     if (item.address === this.activeAddress) return walletStyleSheetType.activeWallet
     if (item.sourceType === CreateWalletType.seed) return walletStyleSheetType.seedWallet
     return walletStyleSheetType.otherWallet
-  }
-
-  // @AppWallet: should be an AppWallet computed property
-  isMultisig(address: string): boolean {
-    const multisigAccountInfo: MultisigAccountInfo = this.activeAccount.multisigAccountInfo[address]
-    if (!multisigAccountInfo) return false
-    return multisigAccountInfo.cosignatories.length > 0
   }
 
   switchWallet(newActiveWalletAddress) {

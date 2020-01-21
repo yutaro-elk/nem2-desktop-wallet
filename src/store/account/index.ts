@@ -1,13 +1,15 @@
 import Vue from 'vue'
-import {MutationTree, ActionTree, GetterTree} from 'vuex'
+import {MutationTree, ActionTree} from 'vuex'
+import {getters} from '@/store/account/accountGetters.ts'
 import {defaultNetworkConfig} from '@/config/index'
 import {
   AddressAndNamespaces, AddressAndMosaics,
-  AddressAndMultisigInfo, StoreAccount, AppMosaic,
-  NetworkCurrency, AppWallet, AppNamespace, FormattedTransaction,
-  CurrentAccount, AppState, Balances,
+  AddressAndMultisigGraphInfo, StoreAccount,
+  AppMosaic, NetworkCurrency, AppWallet,
+  AppNamespace, FormattedTransaction,
+  CurrentAccount, Balances, AppState,
 } from '@/core/model'
-import {localRead, localSave, absoluteAmountToRelativeAmount} from '@/core/utils'
+import {localRead, localSave} from '@/core/utils'
 import {NetworkType, AccountHttp, Address} from 'nem2-sdk'
 import {BalancesService} from '@/core/services/mosaics/BalancesService'
 
@@ -26,10 +28,10 @@ const state: StoreAccount = {
 
   // Properties to move out
   currentAccount: CurrentAccount.default(),
-  multisigAccountInfo: {},
   multisigAccountsMosaics: {},
   multisigAccountsNamespaces: {},
   multisigAccountsTransactions: {},
+  multisigAccountGraphInfo: {},
   networkCurrency: defaultNetworkConfig.defaultNetworkMosaic,
   networkMosaics: {},
   node: '',
@@ -146,9 +148,9 @@ const mutations: MutationTree<StoreAccount> = {
   SET_ACCOUNT_DATA(state: StoreAccount, currentAccount: CurrentAccount) {
     state.currentAccount = currentAccount
   },
-  SET_MULTISIG_ACCOUNT_INFO(state: StoreAccount, addressAndMultisigInfo: AddressAndMultisigInfo) {
-    const {address, multisigAccountInfo} = addressAndMultisigInfo
-    Vue.set(state.multisigAccountInfo, address, multisigAccountInfo)
+  SET_MULTISIG_ACCOUNT_GRAPH_INFO(state: StoreAccount, addressAndMultisigInfo: AddressAndMultisigGraphInfo) {
+    const {address, multisigAccountGraphInfo} = addressAndMultisigInfo
+    Vue.set(state.multisigAccountGraphInfo, address, multisigAccountGraphInfo)
   },
   SET_ACTIVE_MULTISIG_ACCOUNT(state: StoreAccount, publicKey: string) {
     if (publicKey === state.wallet.publicKey) {
@@ -178,8 +180,11 @@ const mutations: MutationTree<StoreAccount> = {
   POP_TRANSACTION_TO_COSIGN_BY_HASH(state: StoreAccount, hash: string) {
     state.transactionsToCosign = popTransactionToCosignByHash([...state.transactionsToCosign], hash)
   },
-  SET_TRANSACTIONS_TO_COSIGN(state: StoreAccount, transactions: FormattedTransaction[]) {
-    state.transactionsToCosign = transactions
+  ADD_TRANSACTIONS_TO_COSIGN(state: StoreAccount, transactions: FormattedTransaction[]) {
+    const newTxHashes = [...transactions].map(({rawTx}) => rawTx.transactionInfo.hash)
+    const oldTransactionsToCosign = [...state.transactionsToCosign]
+      .filter(({rawTx}) => newTxHashes.indexOf(rawTx.transactionInfo.hash) === -1)
+    state.transactionsToCosign = [ ...transactions, ...oldTransactionsToCosign ]
   },
   SET_TEMPORARY_PASSWORD(state: StoreAccount, password: string) {
     state.temporaryLoginInfo.password = password
@@ -214,17 +219,6 @@ const mutations: MutationTree<StoreAccount> = {
   },
 }
 
-const getters: GetterTree<StoreAccount, AppState> = {
-  balance(state): string {
-    const address = state.wallet.address
-    const balances = state.balances[address]
-    const {networkCurrency} = state
-    if (!balances || !networkCurrency) return '0'
-    const balance = balances[networkCurrency.hex]
-    return balance ? absoluteAmountToRelativeAmount(balance, networkCurrency) : '0'
-  },
-}
-
 const actions: ActionTree<any, AppState> = {
   SET_GENERATION_HASH({commit, rootState}, {endpoint, generationHash}) {
     if (endpoint !== rootState.account.node) return
@@ -242,7 +236,14 @@ const actions: ActionTree<any, AppState> = {
     if (endpoint !== rootState.account.node) return
     commit('UPDATE_MOSAICS', appMosaics)
   },
-
+  ADD_UNCONFIRMED_TRANSACTION({commit}, transaction: FormattedTransaction) {
+    commit('POP_TRANSACTION_TO_COSIGN_BY_HASH', transaction)
+    commit('ADD_UNCONFIRMED_TRANSACTION', transaction)
+  },
+  ADD_CONFIRMED_TRANSACTION({commit}, transaction: FormattedTransaction) {
+    commit('POP_TRANSACTION_TO_COSIGN_BY_HASH', transaction)
+    commit('ADD_CONFIRMED_TRANSACTION', transaction)
+  },
   async SET_ACCOUNTS_BALANCES({commit, rootState}) {
     const {walletList} = rootState.app
     const {node} = rootState.account

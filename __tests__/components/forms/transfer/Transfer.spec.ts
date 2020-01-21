@@ -6,7 +6,7 @@ import VeeValidate from 'vee-validate'
 import {NetworkProperties} from '@/core/model'
 // @ts-ignore
 import Transfer from '@/components/forms/transfer/Transfer.vue'
-import {accountMutations, accountState} from '@/store/account/index.ts'
+import {accountMutations, accountState, accountGetters} from '@/store/account/index.ts'
 import {appMutations, appState} from '@/store/app/index.ts'
 import {veeValidateConfig} from '@/core/validation/index.ts'
 import VueRx from 'vue-rx'
@@ -25,6 +25,7 @@ import {
   UInt64,
 } from 'nem2-sdk'
 import {
+  cosignWalletMultisigAccountGraphInfo,
   CosignAccount,
   CosignWallet,
   current1Account,
@@ -32,7 +33,6 @@ import {
   mosaicsLoading,
   Multisig2Account,
   MultisigAccount,
-  multisigAccountInfo,
 } from '@MOCKS/index'
 
 // @ts-ignore
@@ -61,10 +61,13 @@ describe('Transfer', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             currentAccount: current1Account,
+            multisigAccountGraphInfo: {
+              [CosignWallet.address]: cosignWalletMultisigAccountGraphInfo,
+            },
           }),
           mutations: accountMutations.mutations,
+          getters: accountGetters.getters,
         },
         app: {
           state: Object.assign(appState.state, {mosaicsLoading}),

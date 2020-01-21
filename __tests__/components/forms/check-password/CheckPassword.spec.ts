@@ -13,7 +13,6 @@ import flushPromises from 'flush-promises'
 
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   hdAccount,
   networkCurrency,
@@ -46,7 +45,6 @@ describe('CheckPassword', () => {
             wallet: hdAccount.wallets[0],
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
             currentAccount: {
               name: hdAccount.accountName,
               password: hdAccount.password,

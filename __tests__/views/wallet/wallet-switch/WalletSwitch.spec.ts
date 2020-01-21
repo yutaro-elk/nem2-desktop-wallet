@@ -9,7 +9,6 @@ import {accountState} from '@/store/account'
 import {appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import {
-  multisigAccountInfo,
   mosaics,
   networkCurrency,
   hdAccount,
@@ -43,7 +42,6 @@ describe('WalletSwitch', () => {
             wallet: hdAccount.wallets[0],
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
             accountName: hdAccount.accountName,
           }),
         },
@@ -73,5 +71,4 @@ describe('WalletSwitch', () => {
   it('Component WalletSwitch is not null ', () => {
     expect(wrapper).not.toBeNull()
   })
-
 })

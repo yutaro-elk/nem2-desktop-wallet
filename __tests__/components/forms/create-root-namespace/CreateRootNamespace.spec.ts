@@ -5,19 +5,19 @@ import Vuex from 'vuex'
 import VeeValidate from 'vee-validate'
 // @ts-ignore
 import CreateRootNamespace from '@/components/forms/create-root-namespace/CreateRootNamespace.vue'
-import {accountMutations, accountState} from '@/store/account'
+import {accountMutations, accountState, accountGetters} from '@/store/account'
 import {appMutations, appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
 import {DEFAULT_FEES, FEE_GROUPS, FEE_SPEEDS, NETWORK_CONSTANTS} from '@/config'
 import {
-  TransactionType,
-  NamespaceRegistrationTransaction,
-  NamespaceRegistrationType, AggregateTransaction, NetworkType, Deadline, UInt64,
+  TransactionType, NamespaceRegistrationTransaction,
+  NamespaceRegistrationType, AggregateTransaction,
+  NetworkType, Deadline, UInt64,
 } from 'nem2-sdk'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
+  cosignWalletMultisigAccountGraphInfo,
   mosaics,
   networkCurrency,
   CosignWallet,
@@ -55,17 +55,19 @@ describe('CreateRootNamespace', () => {
             wallet: CosignWallet,
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
+            multisigAccountGraphInfo: {
+              [CosignWallet.address]: cosignWalletMultisigAccountGraphInfo,
+            },
           }),
           mutations: accountMutations.mutations,
+          getters: accountGetters.getters,
         },
         app: {
           state: Object.assign(appState.state, {mosaicsLoading}),
           mutations: appMutations.mutations,
         },
       },
-    },
-    )
+    })
             
     store.state.app.networkProperties = NetworkProperties.create(store)
     store.state.app.networkProperties.height = 666
@@ -79,10 +81,6 @@ describe('CreateRootNamespace', () => {
       store,
       router,
     })
-  },
-  )
-  it('Component CreateRootNamespace should render', () => {
-    expect(wrapper).not.toBeNull()
   })
 
   it('should create a NamespaceRegistrationTransaction while all param is right ', async () => {
@@ -109,7 +107,8 @@ describe('CreateRootNamespace', () => {
     expect(namespaceRegistrationTransaction.namespaceName).toBe('abc')
     expect(namespaceRegistrationTransaction.duration.compact()).toBe(1000000)
   })
-  it(' should create an aggregate complete transaction while account is a 1-of-1 multisig ', async () => {
+
+  it(' should create an aggregate complete transaction while account is a 1-of-1 multisig ', async (done) => {
     wrapper.setData({
       formItems: {
         duration: 1000000,
@@ -143,9 +142,11 @@ describe('CreateRootNamespace', () => {
     expect(namespaceRegistrationTransaction.registrationType).toBe(NamespaceRegistrationType.RootNamespace)
     expect(namespaceRegistrationTransaction.namespaceName).toBe('abc')
     expect(namespaceRegistrationTransaction.duration.compact()).toBe(1000000)
+    done()
   })
 
-  it(' should create an aggregate bonded transaction while account is a 2-of-2 multisig ', async () => {
+
+  it(' should create an aggregate bonded transaction while account is a 2-of-2 multisig ', async (done) => {
     wrapper.setData({
       formItems: {
         duration: 1000000,
@@ -154,6 +155,7 @@ describe('CreateRootNamespace', () => {
         feeSpeed: FEE_SPEEDS.NORMAL,
       },
     })
+
     store.commit('SET_ACTIVE_MULTISIG_ACCOUNT', Multisig2Account.publicKey)
     wrapper.vm.submit()
     await flushPromises()
@@ -179,7 +181,9 @@ describe('CreateRootNamespace', () => {
     expect(namespaceRegistrationTransaction.registrationType).toBe(NamespaceRegistrationType.RootNamespace)
     expect(namespaceRegistrationTransaction.namespaceName).toBe('abc')
     expect(namespaceRegistrationTransaction.duration.compact()).toBe(1000000)
+    done()
   })
+  
   it('should not create a normal namespace create transaction while rootNamespaceName is substandard ', () => {
     wrapper.setData({
       formItems: {
@@ -192,6 +196,7 @@ describe('CreateRootNamespace', () => {
     wrapper.vm.submit()
     expect(wrapper.vm.transactionList[0]).toBeUndefined()
   })
+  
   it('should not create a normal namespace create transaction while duration is less than 4', () => {
     wrapper.setData({
       formItems: {

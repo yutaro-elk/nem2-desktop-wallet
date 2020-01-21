@@ -8,11 +8,11 @@
             <div class="form_item">
               <span class="key">{{ $t('account') }}</span>
               <span
-                v-if="!hasMultisigAccounts"
+                v-if="!isCosignatory"
                 class="value text_select"
               >{{ formatAddress(wallet.address) }}
               </span>
-              <SignerSelector v-if="hasMultisigAccounts" v-model="formItems.multisigPublicKey" />
+              <SignerSelector v-if="isCosignatory" v-model="formItems.multisigPublicKey" />
             </div>
 
 

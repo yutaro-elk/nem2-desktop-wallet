@@ -30,9 +30,6 @@
             </i-col>
             <i-col span="9">
               <div @click.stop>
-                <div class="walletTypeTxt">
-                  {{ isMultisig(item.address) ? $t('Public_account') : '' }}
-                </div>
                 <div class="options">
                   <span class="mosaics">
                     <Icon type="logo-buffer" />

@@ -5,11 +5,11 @@
     class="fee-select"
   >
     <Option
-      v-for="item in multisigPublicKeyList"
-      :key="item.publicKey"
-      :value="item.publicKey"
+      v-for="(label, publicKey) in multisigPublicKeyList"
+      :key="publicKey"
+      :value="publicKey"
     >
-      {{ item.label }}
+      {{ label }}
     </Option>
   </Select>
 </template>

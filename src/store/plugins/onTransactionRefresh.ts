@@ -62,7 +62,7 @@ export const onTransactionRefreshModule = (store: any) => { // @TODO: check how 
         }
 
         if (txTypeToGetMultisigInfo.some(a => transactionTypes.some(b => b === a))) {
-          wallet.setMultisigStatus(node, store)
+          wallet.setMultisigStatus(store)
         }
 
         handleRecipientAddressAsNamespaceId([formattedTransaction], store)

@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 import VeeValidate from 'vee-validate'
 // @ts-ignore
 import MultisigAccountModification from '@/components/forms/multisig-account-modification/MultisigAccountModification.vue'
-import {accountMutations, accountState} from '@/store/account'
+import {accountMutations, accountState, accountGetters} from '@/store/account'
 import {appMutations, appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
@@ -19,8 +19,8 @@ import {
   MultisigAccountModificationTransaction,
 } from 'nem2-sdk'
 import {
+  cosignWalletMultisigAccountGraphInfo,
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   MultisigAccount,
   CosignWallet,
@@ -102,9 +102,12 @@ describe('MultisigAccountModification', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
+            multisigAccountGraphInfo: {
+              [CosignWallet.address]: cosignWalletMultisigAccountGraphInfo,
+            },
           }),
           mutations: accountMutations.mutations,
+          getters: accountGetters.getters,
         },
         app: {
           state: Object.assign(appState.state, {mosaicsLoading}),
@@ -263,12 +266,12 @@ describe('MultisigAccountModification', () => {
     })
     const addModificationMock = jest.fn()
     const mockCommit = jest.fn()
-    const mockStore = {commit: mockCommit}
+    const mockStore = {commit: mockCommit, getters: {
+      isCosignatory: false, multisigAccountInfo: null,
+    }}
 
     wrapper.vm.$store = mockStore
-    wrapper.vm.cosignerToAdd = publicAccount.address.plain(
-
-    )
+    wrapper.vm.cosignerToAdd = publicAccount.address.plain()
     wrapper.vm.addModification = addModificationMock
 
     try {
@@ -305,7 +308,9 @@ describe('MultisigAccountModification', () => {
     })
     const addModificationMock = jest.fn()
     const mockCommit = jest.fn()
-    const mockStore = {commit: mockCommit}
+    const mockStore = {commit: mockCommit, getters: {
+      isCosignatory: false, multisigAccountInfo: null,
+    }}
     const mockErrorMessage = jest.fn()
 
     wrapper.vm.showErrorMessage = mockErrorMessage
@@ -348,15 +353,15 @@ describe('MultisigAccountModification', () => {
     })
     const addModificationMock = jest.fn()
     const mockCommit = jest.fn()
-    const mockStore = {commit: mockCommit}
+    const mockStore = {commit: mockCommit, getters: {
+      isCosignatory: false, multisigAccountInfo: null,
+    }}
     const mockErrorMessage = jest.fn()
 
     wrapper.vm.showErrorMessage = mockErrorMessage
     wrapper.vm.activeAccount.node = 'http://unknown.address.endpoint:3000'
     wrapper.vm.$store = mockStore 
-    wrapper.vm.cosignerToAdd = publicAccount.address.plain(
-
-    )
+    wrapper.vm.cosignerToAdd = publicAccount.address.plain()
     wrapper.vm.addModification = addModificationMock
 
     try {

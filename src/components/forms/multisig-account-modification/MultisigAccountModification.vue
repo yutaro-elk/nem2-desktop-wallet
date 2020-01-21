@@ -21,14 +21,14 @@
             </p>
 
             <div
-              v-if="hasMultisigAccounts && mode === MULTISIG_FORM_MODES.MODIFICATION"
+              v-if="isCosignatory && mode === MULTISIG_FORM_MODES.MODIFICATION"
               class="multisig_add"
             >
               <div class="title">
                 {{ $t('sender') }}
               </div>
               <span class="multisig_property_fee">
-                <SignerSelector v-model="formItems.multisigPublicKey" />
+                <SignerSelector v-model="formItems.multisigPublicKey" :hide-active-account="true" />
               </span>
             </div>
 

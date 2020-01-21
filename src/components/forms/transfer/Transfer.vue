@@ -1,12 +1,12 @@
 <template>
   <div class="transfer" @click="isShowSubAlias = false">
     <form @submit.prevent="validateForm('transfer-transaction')" @keyup.enter="submit">
-      <div v-if="!hasMultisigAccounts" class="flex_center">
+      <div v-if="!isCosignatory" class="flex_center">
         <span class="title">{{ $t('sender') }}</span>
         <span class="value no-border">{{ formatAddress(wallet.address) }}</span>
       </div>
 
-      <div v-if="hasMultisigAccounts" class="address flex_center">
+      <div v-if="isCosignatory" class="address flex_center">
         <span class="title">{{ $t('sender') }}</span>
         <span class="value radius flex_center">
           <SignerSelector v-model="formItems.multisigPublicKey" />

@@ -69,7 +69,7 @@
                     class="col2-item bottom tag"
                   >
                     -> {{ c.txHeader.tag }} 
-                    <span v-if="c.toCosign" class="click-to-cosign">
+                    <span v-if="showClickToCosign(c)" class="click-to-cosign">
                       ({{ $t('Click_to_cosign') }})
                     </span>
                   </span>

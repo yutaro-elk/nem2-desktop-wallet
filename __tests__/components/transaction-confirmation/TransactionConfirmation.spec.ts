@@ -13,7 +13,6 @@ import {transactionConfirmationObservable} from '@/core/services/transactions'
 
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   hdAccount,
   networkCurrency,
@@ -64,7 +63,6 @@ describe('TransactionConfirmation when staged transaction isn\'t set', () => {
             wallet: AppWallet.createFromDTO(hdAccount.wallets[0]),
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
             currentAccount: {
               name: hdAccount.accountName,
               password: hdAccount.password,

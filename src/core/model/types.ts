@@ -1,12 +1,14 @@
 import {
-  Transaction, MultisigAccountInfo, SignedTransaction,
-  CosignatureSignedTransaction, SimpleWallet, NetworkType,
+  Transaction, SignedTransaction, Address,
+  CosignatureSignedTransaction, SimpleWallet,
+  NetworkType, MultisigAccountGraphInfo,
+  MultisigAccountInfo,
 } from 'nem2-sdk'
 import {AppNamespace} from './AppNamespace'
 import {AppMosaic} from './AppMosaic'
 import {FormattedTransaction} from './FormattedTransaction'
 import {NetworkProperties, AppWallet, LockParams, Log, CurrentAccount} from '.'
-import {TransactionFormatter} from '../services'
+import {TransactionFormatter, PartialTransactionsFetcher} from '../services'
 import {Listeners} from './Listeners'
 import {NetworkManager} from './NetworkManager'
 
@@ -28,6 +30,11 @@ export interface AddressAndMosaics {
 export interface AddressAndMultisigInfo {
   address: string
   multisigAccountInfo: MultisigAccountInfo
+}
+
+export interface AddressAndMultisigGraphInfo {
+  address: string
+  multisigAccountGraphInfo: MultisigAccountGraphInfo
 }
 
 export interface NetworkCurrency {
@@ -54,10 +61,14 @@ export interface StoreAccount {
   balances: Record<string, Balances>
   currentAccount: CurrentAccount
   mosaics: Record<string, AppMosaic>
-  multisigAccountInfo: Record<string, MultisigAccountInfo>
   multisigAccountsMosaics: Record<string, Record<string, AppMosaic>>
   multisigAccountsNamespaces: Record<string, AppNamespace[]>
   multisigAccountsTransactions: Record<string, Transaction[]>
+  multisigAccountGraphInfo: Record<string, MultisigAccountGraphInfo>
+  /**
+     *  The network currency, to be used for fees management,
+     *  formatting, defaulting...
+     */
   namespaces: AppNamespace[]
   networkCurrency: NetworkCurrency
   networkMosaics: Record<string, AppMosaic>
@@ -96,6 +107,7 @@ export interface AppInfo {
   uiDisabledMessage: string
   walletList: AppWallet[]
   xemUsdPrice: number
+  partialTransactionsFetcher: PartialTransactionsFetcher
 }
 
 export interface StagedTransaction {
@@ -116,9 +128,21 @@ export interface SignTransaction {
   error: (string | null)
 }
 
+export interface AccountGetters {
+  activeMultisigAccountAddress: Address 
+  activeMultisigAccountMultisigAccountInfo: MultisigAccountInfo 
+  activeMultisigAccountPlainAddress: string 
+  announceInLock: boolean 
+  isCosignatory: boolean 
+  isMultisig: boolean 
+  multisigAccountGraphInfo: MultisigAccountGraphInfo
+  multisigAccountInfo: MultisigAccountInfo 
+}
+
 export interface AppState {
   app: AppInfo
   account: StoreAccount
+  getters: AccountGetters
 }
 
 export interface DefaultFee {

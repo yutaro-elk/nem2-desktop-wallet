@@ -16,7 +16,6 @@ import {
   Mosaic,
   MosaicId,
   UInt64,
-  MultisigHttp,
   PublicAccount,
   PersistentHarvestingDelegationMessage,
   TransferTransaction,
@@ -32,7 +31,7 @@ import {
   AppAccounts, FormattedTransaction, NoticeType,
   Path, HdWallet,
 } from '@/core/model'
-import {setTransactionList, setPartialTransactions} from '@/core/services'
+import {setTransactionList, setPartialTransactions, MultisigService} from '@/core/services'
 import {Log} from './Log'
 import {Notice} from './Notice'
 
@@ -347,16 +346,8 @@ export class AppWallet {
     localSave('accountMap', JSON.stringify(accountMap))
   }
 
-  async setMultisigStatus(node: string, store: Store<AppState>): Promise<void> {
-    try {
-      const multisigAccountInfo = await new MultisigHttp(node)
-        .getMultisigAccountInfo(Address.createFromRawAddress(this.address)).toPromise()
-      store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo})
-      store.commit('SET_MULTISIG_LOADING', false)
-    } catch (error) {
-      store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo: null})
-      store.commit('SET_MULTISIG_LOADING', false)
-    }
+  async setMultisigStatus(store: Store<AppState>): Promise<void> {
+    await MultisigService.updateAccountMultisigData(this.publicKey, store)
   }
 
   isLinked(): boolean {
@@ -489,7 +480,10 @@ export class AppWallet {
       store,
     )
   }
+
   setPartialTransactions(store: Store<AppState>): void {
+    if (store.getters.isMultisig) return
+
     setPartialTransactions(
       Address.createFromRawAddress(this.address), store,
     )

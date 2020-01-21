@@ -8,7 +8,7 @@ import {
   AccountHttp,
   AggregateTransaction,
 } from 'nem2-sdk'
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {Component, Vue, Prop, Provide} from 'vue-property-decorator'
 import {timeout, finalize} from 'rxjs/operators'
 import {Message, DEFAULT_FEES, FEE_GROUPS, formDataConfig, networkConfig} from '@/config/index.ts'
@@ -51,11 +51,15 @@ const formLabels = {
     ...mapState({
       activeAccount: 'account',
     }),
+    ...mapGetters([
+      'multisigAccountInfo',
+    ]),
   },
 })
 export class MultisigAccountModificationTs extends Vue {
   @Provide() validator: any = this.$validator
   activeAccount: StoreAccount
+  multisigAccountInfo: MultisigAccountInfo
   MULTISIG_FORM_MODES = MULTISIG_FORM_MODES
   signAndAnnounce = signAndAnnounce
   AddOrRemove = AddOrRemove
@@ -71,23 +75,18 @@ export class MultisigAccountModificationTs extends Vue {
     return this.activeAccount.wallet
   }
 
+  get isCosignatory(): boolean {
+    return this.$store.getters.isCosignatory
+  }
+
   get defaultFormItems() {
     return this.mode === MULTISIG_FORM_MODES.CONVERSION
       ? cloneData(formDataConfig.multisigConversionForm)
       : cloneData(formDataConfig.multisigModificationForm)
   }
-  get currentAccountMultisigInfo(): MultisigAccountInfo {
-    const { address } = this.wallet
-    return this.activeAccount.multisigAccountInfo[address]
-  }
-
-  get hasMultisigAccounts(): boolean {
-    if (!this.currentAccountMultisigInfo) return false
-    return this.currentAccountMultisigInfo.multisigAccounts.length > 0
-  }
 
   get multisigPublicKeyList(): {publicKey: string, address: string}[] {
-    if (!this.hasMultisigAccounts) return null
+    if (!this.isCosignatory) return null
     const { publicKey, address } = this.wallet
 
     const selfPublicKeyItem = {
@@ -95,7 +94,7 @@ export class MultisigAccountModificationTs extends Vue {
       address: `(self) ${formatAddress(address)}`,
     }
 
-    const list = this.currentAccountMultisigInfo.multisigAccounts
+    const list = this.multisigAccountInfo.multisigAccounts
       .map(({ publicKey }) => ({
         publicKey,
         address: formatAddress(Address.createFromPublicKey(publicKey, this.networkType).plain()),
@@ -121,8 +120,8 @@ export class MultisigAccountModificationTs extends Vue {
   }
 
   get hasCosignatories(): boolean {
-    if (!this.currentAccountMultisigInfo) return false
-    return this.currentAccountMultisigInfo.cosignatories.length > 0
+    if (!this.multisigAccountInfo) return false
+    return this.multisigAccountInfo.cosignatories.length > 0
   }
 
   get publicKey() {
@@ -154,16 +153,16 @@ export class MultisigAccountModificationTs extends Vue {
   }
 
   get displayForm(): boolean {
-    const { mode, hasMultisigAccounts, hasCosignatories } = this
+    const { mode, isCosignatory, hasCosignatories } = this
     if (hasCosignatories) return false
-    if (mode === MULTISIG_FORM_MODES.MODIFICATION && !hasMultisigAccounts) return false
+    if (mode === MULTISIG_FORM_MODES.MODIFICATION && !isCosignatory) return false
     return true
   }
 
   get formHeadline(): string {
-    const { mode, hasMultisigAccounts, hasCosignatories } = this
+    const { mode, isCosignatory, hasCosignatories } = this
     if (hasCosignatories) return 'this_account_is_already_converted'
-    if (mode === MULTISIG_FORM_MODES.MODIFICATION && !hasMultisigAccounts) return 'this_account_is_not_a_cosignatory'
+    if (mode === MULTISIG_FORM_MODES.MODIFICATION && !isCosignatory) return 'this_account_is_not_a_cosignatory'
     if (mode === MULTISIG_FORM_MODES.CONVERSION) return 'Convert_to_multi_sign_account'
     if (mode === MULTISIG_FORM_MODES.MODIFICATION) return 'Edit_co_signers_and_signature_thresholds'
   }

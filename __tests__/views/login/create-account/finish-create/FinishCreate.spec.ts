@@ -13,7 +13,6 @@ import {AppWallet} from '@/core/model'
 import VueRx from 'vue-rx'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -62,7 +61,6 @@ describe('FinishCreate', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             currentAccount: {
               networkType: NetworkType.TEST_NET,
               name: 'current account name',

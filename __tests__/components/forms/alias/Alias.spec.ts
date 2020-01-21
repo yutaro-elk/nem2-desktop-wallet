@@ -18,7 +18,6 @@ import {
 } from 'nem2-sdk'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   hdAccountData,
   hdAccount,
@@ -51,7 +50,6 @@ describe('Alias from namespace', () => {
         account: {
           state: Object.assign(accountState.state, {
             mosaics,
-            multisigAccountInfo,
             wallet: AppWallet.createFromDTO(hdAccount.wallets[0]),
             currentAccount: new CurrentAccount(null, hdAccount.password, hdAccount.networkType),
           }),
