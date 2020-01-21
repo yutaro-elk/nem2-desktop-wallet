@@ -592,7 +592,7 @@
     "Control": "コントロール",
     "unbind_alias": "エイリアスのアンリンク",
     "Restrictable": "制限可",
-    "Please_enter_mosaic_hex_or_alias": "モザイクIDまたは@モザイクエイリアス(@nem.xem)を入力してください",
+    "Please_enter_mosaic_hex_or_alias": "モザイクIDまたは@モザイクエイリアス(@alice.coin)を入力してください",
     "mosaic_alias_not_exist": "モザイクエイリアスは存在しません",
     "Create_an_account_and_password": "アカウントとパスワードの作成",
     "set_the_account_name": "アカウント名を設定",

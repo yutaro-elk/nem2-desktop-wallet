@@ -592,7 +592,7 @@
   "Control": "Control",
   "unbind_alias": "Unlink alias",
   "Restrictable": "Restrictable",
-  "Please_enter_mosaic_hex_or_alias": "Please enter a mosaic id or a mosaic alias (@nem.xem)",
+  "Please_enter_mosaic_hex_or_alias": "Please enter a mosaic id or a mosaic alias (@alice.coin)",
   "mosaic_alias_not_exist": "Mosaic alias does not exist",
   "Create_an_account_and_password": "Create an account and password",
   "set_the_account_name": "Set the account name",

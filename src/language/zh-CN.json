@@ -637,7 +637,7 @@
   "Control": "控制权",
   "unbind_alias": "解绑别名",
   "Restrictable": "限制性",
-  "Please_enter_mosaic_hex_or_alias": "请输入马赛克hex或@马赛克别名（@nem.xem）",
+  "Please_enter_mosaic_hex_or_alias": "请输入马赛克hex或@马赛克别名（@alice.coin）",
   "mosaic_alias_not_exist": "马赛克别名不存在",
   "Please_select_public_key": "请选择账户公钥",
   "public": "公钥",
