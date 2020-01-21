@@ -38,6 +38,7 @@
               <Select
                 v-model="selectedMosaicHex"
                 v-validate
+                @on-change="$validator.validate('currentAmount', currentAmount).catch(e => e)"
                 :data-vv-as="$t('asset_type')"
                 :placeholder="$t('asset_type')"
                 class="asset_type"
@@ -53,7 +54,7 @@
             <span class="amount value radius flex_center">
               <ErrorTooltip field-name="currentAmount" placement-override="top" class="amountTooltip">
                 <input
-                  v-model.lazy="currentAmount"
+                  v-model.number="currentAmount"
                   v-validate="validation.amount"
                   :placeholder="$t('please_enter_the_transfer_amount')"
                   :data-vv-as="$t('amount')"

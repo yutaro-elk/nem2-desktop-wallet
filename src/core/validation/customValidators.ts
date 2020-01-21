@@ -272,9 +272,9 @@ const mosaicAmountValidator = (context): Promise<ValidationObject> => {
     (amount, [otherField]) => new Promise((resolve) => {
       try {
         const appMosaic: AppMosaic = getOtherFieldValue(otherField, context)
-        const absoluteAmount = getAbsoluteMosaicAmount(amount, appMosaic.properties.divisibility)
-        if (isNaN(absoluteAmount)) resolve({valid: false})
-        if (absoluteAmount > maxMosaicAtomicUnits) resolve({valid: false})
+        const maxAmount = appMosaic.balance
+        if (isNaN(amount)) resolve({valid: false})
+        if (amount > maxAmount) resolve({valid: false})
         resolve({valid: true})
       } catch (error) {
         resolve({valid: false})

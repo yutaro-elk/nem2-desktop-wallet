@@ -186,28 +186,13 @@ const routers = [
             },
             component: () => import('@/views/setting/setting-normal/SettingNormal.vue'),
           }, {
-            path: '/offlineSetting',
-            name: 'offlineSetting',
-            meta: {
-              title: 'offline_setting',
-            },
-            component: () => import('@/views/setting/offline-setting/OfflineSetting.vue'),
-          }, {
             path: '/settingPassword',
             name: 'settingPassword',
             meta: {
               title: 'account_password',
             },
             component: () => import('@/views/setting/setting-password/SettingPassword.vue'),
-          }, {
-            path: '/settingNetwork',
-            name: 'settingNetwork',
-            meta: {
-              disabled: true,
-              title: 'network_settings',
-            },
-            component: () => import('@/views/setting/setting-network/SettingNetwork.vue'),
-          }, {
+          },{
             path: '/settingAbout',
             name: 'settingAbout',
             meta: {

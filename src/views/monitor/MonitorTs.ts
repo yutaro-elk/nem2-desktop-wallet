@@ -8,6 +8,7 @@ import {AppInfo, MosaicNamespaceStatusType, StoreAccount} from '@/core/model'
 import routes from '@/router/routers'
 import numberGrow from '@/components/number-grow/NumberGrow.vue'
 import NumberFormatting from '@/components/number-formatting/NumberFormatting.vue'
+import {Address} from 'nem2-sdk'
 
 @Component({
   components: {
@@ -50,7 +51,7 @@ export class MonitorTs extends Vue {
   }
 
   get address() {
-    return this.activeAccount.wallet ? this.activeAccount.wallet.address : ''
+    return this.activeAccount.wallet ? Address.createFromRawAddress(this.activeAccount.wallet.address).pretty() : ''
   }
 
   get mosaicMap() {

@@ -36,6 +36,8 @@ import NumberFormatting from '@/components/number-formatting/NumberFormatting.vu
   },
 })
 export class TransferTs extends Vue {
+  c = 1
+
   @Provide() validator: any = this.$validator
   activeAccount: StoreAccount
   app: AppInfo
@@ -45,7 +47,7 @@ export class TransferTs extends Vue {
   isShowSubAlias = false
   currentCosignatoryList = []
   selectedMosaicHex = ''
-  currentAmount: number = null
+  currentAmount = 0
   isAddressMapNull = true
   formItems = cloneData(formDataConfig.transferForm)
   validation = validation
@@ -184,8 +186,8 @@ export class TransferTs extends Vue {
   }
 
   initForm() {
-    this.selectedMosaicHex = null
-    this.currentAmount = null
+    this.selectedMosaicHex = this.mosaicList[0] ? this.mosaicList[0].value : null
+    this.currentAmount = 0
     this.formItems = cloneData(formDataConfig.transferForm)
     this.formItems.multisigPublicKey = this.wallet.publicKey
     this.resetFields()
@@ -322,13 +324,8 @@ export class TransferTs extends Vue {
     }
   }
 
-  @Watch('selectedMosaicHex', {immediate: true})
-  onSelectedMosaicHexChange() {
-    /** Makes currentAmount validation reactive */
-    this.$validator.validate('currentAmount', this.currentAmount).catch(e => e)
-  }
-
-  async mounted() {
+  mounted() {
     this.initForm()
   }
+
 }
