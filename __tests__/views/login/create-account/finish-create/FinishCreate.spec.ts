@@ -95,7 +95,7 @@ describe('FinishCreate', () => {
     wrapper.vm.submit()
     expect(AppWallet).toHaveBeenCalledTimes(1)
     expect(mockCreateFromMnemonicCall.mock.calls[0][0]).toStrictEqual([
-      'SeedWallet',
+      'SeedWallet-1',
       new Password('password'),
       expectedMnemonic,
       NetworkType.TEST_NET,

@@ -75,8 +75,8 @@ export default class WalletChooseTs extends Vue {
 
       const accountsInfo = await new AccountHttp(node)
         .getAccountsInfo(addressList).toPromise()
-            
-            
+
+
       this.addressMosaicMap = accountsInfo
         .map(({mosaics, address}) => {
           const defaultMosaic = mosaics.find(
@@ -104,7 +104,7 @@ export default class WalletChooseTs extends Vue {
   }
 
   removeAccount(index) {
-    const newSelectedAccountMap = {...this.selectedAccountMap} 
+    const newSelectedAccountMap = {...this.selectedAccountMap}
     delete newSelectedAccountMap[index]
     this.selectedAccountMap = newSelectedAccountMap
   }
@@ -123,7 +123,7 @@ export default class WalletChooseTs extends Vue {
     }
     walletList.forEach((item) => {
       new AppWallet().createFromPath(
-        `${APP_PARAMS.SEED_WALLET_NAME_PREFIX}${item.path}`,
+        `${APP_PARAMS.SEED_WALLET_NAME_PREFIX}${Number(item.path) + 1}`,
         new Password(password),
         Number(item.path), networkType,
         this.$store,

@@ -36,7 +36,7 @@ export class HdWallet {
     const hdWallet = new HdWallet()
     const remoteAccountsPaths = [...Array(numberOfAccounts).keys()]
       .map(index => Path.getRemoteAccountPath(seedWalletPath, remoteAccountFirstIndex + index))
-  
+
     const extendedKey = hdWallet.getExtendedKeyFromMnemonic(mnemonic, networkType)
     return hdWallet.getAccountsFromExtendedKeyAndPaths(extendedKey, remoteAccountsPaths, networkType)
   }
@@ -74,10 +74,10 @@ export class HdWallet {
     numberOfAccounts: number,
   ): Account[] {
     const hdWallet = new HdWallet()
-    const extendedKey = hdWallet.getExtendedKeyFromPrivateKey(privateKey, networkType) 
+    const extendedKey = hdWallet.getExtendedKeyFromPrivateKey(privateKey, networkType)
     const paths = [...Array(numberOfAccounts).keys()]
       .map(index => Path.getRemoteAccountPath(Path.getFromSeedIndex(0), remoteAccountFirstIndex + index))
- 
+
     return hdWallet.getAccountsFromExtendedKeyAndPaths(
       extendedKey, paths, networkType,
     )

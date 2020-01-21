@@ -32,7 +32,7 @@ export default class FinishCreateTs extends Vue {
     const {accountName, seed, networkType, password} = this
     try {
       new AppWallet().createFromMnemonic(
-        'SeedWallet',
+        'SeedWallet-1',
         new Password(password),
         seed,
         networkType,

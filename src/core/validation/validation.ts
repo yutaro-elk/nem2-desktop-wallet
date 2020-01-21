@@ -66,5 +66,6 @@ export const validation = {
   walletName:{
     required: true,
   },
+  mnemonicsCheck:`required|${CUSTOM_VALIDATORS_NAMES.mnemonicCheck}`,
 
 }

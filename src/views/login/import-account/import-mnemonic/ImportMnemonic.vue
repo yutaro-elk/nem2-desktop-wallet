@@ -5,7 +5,16 @@
     </p>
     <div class="create-mnemonic-col">
       <div class="create-mnemonic-left">
-        <textarea v-model="seed" class="show-mnemonic" />
+        <ErrorTooltip field-name="mnemonic" placement-override="top">
+          <textarea
+            v-model.lazy="seed"
+            v-focus
+            v-validate="validation.mnemonicCheck"
+            data-vv-name="mnemonic"
+            :data-vv-as="$t('mnemonic')"
+            class="show-mnemonic"
+          />
+        </ErrorTooltip>
         <div class="button-container">
           <button class="info-button" @click="goToCreateAccountInfo">
             {{ $t('Return_password_setting') }}

@@ -52,7 +52,7 @@
     <div class="walletMethod">
       <Row>
         <i-col span="12">
-          <div class="createBtn pointer" @click="showWalletAdd = true">
+          <div class="createBtn pointer" @click="checkBeforeShowWalletAdd">
             {{ $t('from_seed') }}
           </div>
         </i-col>

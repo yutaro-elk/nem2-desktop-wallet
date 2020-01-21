@@ -22,7 +22,7 @@ import {
 } from 'nem2-sdk'
 import CryptoJS from 'crypto-js'
 import {filter, mergeMap} from 'rxjs/operators'
-import {Message, networkConfig, defaultNetworkConfig, NETWORK_CONSTANTS} from '@/config'
+import {Message, networkConfig, defaultNetworkConfig, NETWORK_CONSTANTS, APP_PARAMS} from '@/config'
 import {
   localRead, localSave,
 } from '@/core/utils'

@@ -88,8 +88,4 @@ describe('WalletSwitch', () => {
     expect(wrapper.vm.pathToCreate).toBe(2)
   })
 
-  it('the initial pathToCreate should return 2', () => {
-    wrapper.vm.$store.commit('SET_WALLET_LIST', [...Array(10)].map(() => hdAccount.wallets[0]))
-    expect(wrapper.vm.pathToCreate).toBe(undefined)
-  })
 })

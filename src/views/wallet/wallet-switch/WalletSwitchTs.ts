@@ -9,6 +9,7 @@ import TheWalletDelete from '@/views/wallet/wallet-switch/the-wallet-delete/TheW
 import MnemonicDialog from '@/views/wallet/wallet-details/mnemonic-dialog/MnemonicDialog.vue'
 import NumberFormatting from '@/components/number-formatting/NumberFormatting.vue'
 import {BalancesService} from '@/core/services'
+import {APP_PARAMS, Message} from '@/config'
 
 @Component({
   components: {
@@ -85,6 +86,17 @@ export class WalletSwitchTs extends Vue {
     }
 
     this.showMnemonicDialog = true
+  }
+
+  checkBeforeShowWalletAdd(){
+    const seedPathList = this.walletList.filter(item => item.sourceType == CreateWalletType.seed)
+    const numberOfSeedPath = seedPathList.length
+    if (numberOfSeedPath >= APP_PARAMS.MAX_SEED_WALLETS_NUMBER) {
+      Notice.trigger(Message.SEED_WALLET_OVERFLOW_ERROR, NoticeType.error, this.$store)
+      this.showWalletAdd = false
+      return
+    }
+    this.showWalletAdd = true
   }
 
   @Watch('activeAddress')

@@ -43,13 +43,13 @@
           </div>
           <div class="scroll radius">
             <div
-              v-for="(value,key,index) in selectedAccountMap" :key="key" class="table-item pointer"
+              v-for="(value,key) in selectedAccountMap" :key="key" class="table-item pointer"
               @click="removeAccount(key)"
             >
-              <span class="address-id"> {{ index + 1 }} </span>
+              <span class="address-id"> {{ Number(key) + 1}} </span>
               <span class="address-value">{{ miniAddress(value) }}</span>
               <span class="address-balance overflow_ellipsis">{{ addressMosaicMap[value.plain()] || 'N/A' }}</span>
-              <span class="remove-icon"><img src="@/common/img/Invisible@2x.png"></span>
+              <span class="remove-icon"><Icon type="md-eye-off" /></span>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@
         <p class="title-tips">
           {{ $t('Do_not_have_Account') }}
           <span
-            class="create-account"
+            class="create-account pointer"
             @click="$router.push({name:'createAccount',params:{nextPage:'generateMnemonic'}})"
           >
             {{ $t('create_a_new_account') }}
@@ -17,7 +17,7 @@
       </div>
       <div class="account-type">
         <div
-          v-for="(item,index) in importInfoList" :key="index" class="account-item"
+          v-for="(item,index) in importInfoList" :key="index" class="account-item pointer"
           @click="goTo(item.link)"
         >
           <div class="img-box radius">
