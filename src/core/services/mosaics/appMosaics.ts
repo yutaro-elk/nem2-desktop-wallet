@@ -19,7 +19,7 @@ import {
 import {flatMap, map, toArray} from 'rxjs/operators'
 import {AppMosaic} from '@/core/model'
 import {Store} from 'vuex'
-import {flattenArrayOfStrings} from '@/core/utils'
+import {flattenArray} from '@/core/utils'
 
 export const AppMosaics = () => ({
   store: null,
@@ -96,7 +96,7 @@ export const AppMosaics = () => ({
      */
   fromTransactions(transactions: Transaction[]): AppMosaic[] {
     const allMosaics = transactions.map(x => this.extractMosaicsFromTransaction(x))
-    const flattenedMosaicIds = flattenArrayOfStrings(allMosaics)
+    const flattenedMosaicIds = flattenArray(allMosaics)
 
     const allMosaicIds = flattenedMosaicIds
       .filter(x => (x && x.id instanceof MosaicId))

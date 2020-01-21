@@ -107,7 +107,7 @@
   "divisibility_can_not_less_than_0": "Divisibility cannot be less than 0",
   "duration_can_not_less_than_0": "Duration cannot be less than 0",
   "fee_can_not_less_than_0": "Max fee cannot be less than 0",
-  "duration_can_not_more_than_10_years": "Duration cannot be greater than 10 years",
+  "mosaic_max_duration_error": "Duration cannot be greater than {MAX_MOSAIC_DURATION_YEARS} years",
   "duration_can_not_more_than_1_years": "Duration cannot be greater 1 year",
   "set_amount": "Set amount",
   "asset_type": "Asset",
@@ -592,7 +592,7 @@
   "Control": "Control",
   "unbind_alias": "Unlink alias",
   "Restrictable": "Restrictable",
-  "Please_enter_mosaic_hex_or_alias": "Please enter a mosaic id or a mosaic alias (@nem.xem)",
+  "Please_enter_mosaic_hex_or_alias": "Please enter a mosaic id or a mosaic alias (@alice.coin)",
   "mosaic_alias_not_exist": "Mosaic alias does not exist",
   "Create_an_account_and_password": "Create an account and password",
   "set_the_account_name": "Set the account name",
@@ -945,5 +945,7 @@
   "confirm_information_before_add_child_wallet": "Enter your password to create a new child wallet",
   "loading": "loading...",
   "Enter_your_password_to_create_a_link_transaction": "Enter your password to create an account link transaction",
-  "Click_to_cosign": "Click to cosign"
+  "Click_to_cosign": "Click to cosign",
+  "mosaic_duration_hint": "The duration is calculated in blocks. One block is {targetBlockTime} seconds. The maximum duration is {MAX_MOSAIC_DURATION_YEARS} years",
+  "Creation_failed":"Creation failed"
 }

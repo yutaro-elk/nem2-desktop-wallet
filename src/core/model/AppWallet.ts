@@ -16,15 +16,13 @@ import {
   Mosaic,
   MosaicId,
   UInt64,
-  EncryptedPrivateKey,
-  MultisigHttp,
   PublicAccount,
   PersistentHarvestingDelegationMessage,
   TransferTransaction,
 } from 'nem2-sdk'
 import CryptoJS from 'crypto-js'
 import {filter, mergeMap} from 'rxjs/operators'
-import {Message, networkConfig, defaultNetworkConfig, NETWORK_CONSTANTS} from '@/config'
+import {Message, networkConfig, defaultNetworkConfig, NETWORK_CONSTANTS, APP_PARAMS} from '@/config'
 import {
   localRead, localSave,
 } from '@/core/utils'
@@ -33,7 +31,7 @@ import {
   AppAccounts, FormattedTransaction, NoticeType,
   Path, HdWallet,
 } from '@/core/model'
-import {setTransactionList, setPartialTransactions} from '@/core/services'
+import {setTransactionList, setPartialTransactions, MultisigService} from '@/core/services'
 import {Log} from './Log'
 import {Notice} from './Notice'
 
@@ -41,32 +39,35 @@ const {DEFAULT_LOCK_AMOUNT} = defaultNetworkConfig
 const {EMPTY_PUBLIC_KEY} = networkConfig
 
 export class AppWallet {
+  name: string
+  simpleWallet: SimpleWallet
+  address: string
+  publicKey: string
+  path: string
+  sourceType: string
+
+  // Should use AppAccount
+  networkType: NetworkType
+  active: boolean
+  encryptedMnemonic: string
+
+  // Should use store
+  importance: number
+  linkedAccountKey: string
+  remoteAccount: RemoteAccount | null
+  numberOfMosaics: number
+  // Remove
+  temporaryRemoteNodeConfig: {
+    publicKey: string
+    node: string
+  } | null
+
   constructor(wallet?: {
     name?: string
     simpleWallet?: SimpleWallet
   }) {
     Object.assign(this, wallet)
   }
-
-  name: string | undefined
-  simpleWallet: SimpleWallet | undefined
-  address: string | undefined
-  publicKey: string | undefined
-  networkType: NetworkType | undefined
-  active: boolean | undefined
-  balance: number | 0
-  encryptedMnemonic: string | undefined
-  path: string
-  sourceType: string
-  importance: number
-  linkedAccountKey: string
-  remoteAccount: RemoteAccount | null
-  numberOfMosaics: number
-  isKnownByTheNetwork = true
-  temporaryRemoteNodeConfig: {
-    publicKey: string
-    node: string
-  } | null
 
   get publicAccount(): PublicAccount {
     return PublicAccount.createFromPublicKey(this.publicKey, this.networkType)
@@ -104,7 +105,6 @@ export class AppWallet {
     pathNumber: number,
     networkType: NetworkType,
     store: Store<AppState>,
-    balance?: number,
   ): AppWallet {
     try {
       const accountName = store.state.account.currentAccount.name
@@ -120,7 +120,6 @@ export class AppWallet {
       this.path = Path.getFromSeedIndex(pathNumber)
       this.sourceType = CreateWalletType.seed
       this.encryptedMnemonic = AppAccounts().encryptString(mnemonic, password.value)
-      this.balance = balance || 0
       this.addNewWalletToList(store)
       return this
     } catch (error) {
@@ -224,17 +223,6 @@ export class AppWallet {
     return CryptoJS.enc.Base64.stringify(parsed)
   }
 
-  getRemoteAccountPrivateKey(password: string): string {
-    try {
-      if (!this.checkPassword(password)) throw new Error('Wrong password')
-      const _password = new Password(password)
-      const {encryptedKey, iv} = this.remoteAccount.simpleWallet.encryptedPrivateKey
-      return new EncryptedPrivateKey(encryptedKey, iv).decrypt(_password).toUpperCase()
-    } catch (error) {
-      throw new Error(error)
-    }
-  }
-
   checkPassword(password: string): boolean {
     try {
       this.getAccount(new Password(password))
@@ -315,31 +303,23 @@ export class AppWallet {
     localSave('accountMap', JSON.stringify(accountMap))
   }
 
-  async setAccountInfo(store: Store<AppState>): Promise<void> {
+  async setAccountInfo(store: Store<AppState>): Promise<{walletKnownByNetwork: boolean}> {
     const {EMPTY_PUBLIC_KEY} = networkConfig
     const [accountInfo] = await new AccountHttp(store.state.account.node)
       .getAccountsInfo([Address.createFromRawAddress(store.state.account.wallet.address)])
       .toPromise()
+
     if(!accountInfo){
-      this.isKnownByTheNetwork = false
       this.updateWallet(store)
-      return
+      return {walletKnownByNetwork: false}
     }
+
     this.numberOfMosaics = accountInfo.mosaics ? accountInfo.mosaics.length : 0
     this.importance = accountInfo.importance.compact()
     this.linkedAccountKey = accountInfo.linkedAccountKey === EMPTY_PUBLIC_KEY
       ? null : accountInfo.linkedAccountKey
-    this.isKnownByTheNetwork = true
     this.updateWallet(store)
-  }
-
-  async updateAccountBalance(balance: number, store: Store<AppState>): Promise<void> {
-    try {
-      this.balance = balance
-      this.updateWallet(store)
-    } catch (error) {
-      console.error('AppWallet -> error', error)
-    }
+    return {walletKnownByNetwork: true}
   }
 
   updateWalletName(newWalletName: string, store: Store<AppState>) {
@@ -366,16 +346,8 @@ export class AppWallet {
     localSave('accountMap', JSON.stringify(accountMap))
   }
 
-  async setMultisigStatus(node: string, store: Store<AppState>): Promise<void> {
-    try {
-      const multisigAccountInfo = await new MultisigHttp(node)
-        .getMultisigAccountInfo(Address.createFromRawAddress(this.address)).toPromise()
-      store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo})
-      store.commit('SET_MULTISIG_LOADING', false)
-    } catch (error) {
-      store.commit('SET_MULTISIG_ACCOUNT_INFO', {address: this.address, multisigAccountInfo: null})
-      store.commit('SET_MULTISIG_LOADING', false)
-    }
+  async setMultisigStatus(store: Store<AppState>): Promise<void> {
+    await MultisigService.updateAccountMultisigData(this.publicKey, store)
   }
 
   isLinked(): boolean {
@@ -508,7 +480,10 @@ export class AppWallet {
       store,
     )
   }
+
   setPartialTransactions(store: Store<AppState>): void {
+    if (store.getters.isMultisig) return
+
     setPartialTransactions(
       Address.createFromRawAddress(this.address), store,
     )

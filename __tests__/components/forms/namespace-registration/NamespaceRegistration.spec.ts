@@ -13,7 +13,6 @@ import flushPromises from 'flush-promises'
 import {NamespaceName, NamespaceId} from 'nem2-sdk'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -63,7 +62,6 @@ describe('NamespaceRegistration', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
           }),
           mutations: accountMutations.mutations,
         },

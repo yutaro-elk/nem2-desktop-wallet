@@ -63,7 +63,7 @@ export const getTopValueInObject = (object: any): any => {
  * Flattens an array that can have elements nested up to 2 levels
  * @param array
  */
-export const flattenArrayOfStrings = (array: any[]): any[] => {
+export const flattenArray = (array: any[]): any[] => {
   const step1 = [].concat(...array).map(item => item)
   return [].concat(...step1).map(item => item)
 }

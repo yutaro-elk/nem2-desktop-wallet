@@ -4,11 +4,12 @@ import {formatNumber} from '@/core/utils'
 import {AppWallet, AppInfo, StoreAccount, Notice, NoticeType} from '@/core/model'
 import {CreateWalletType} from '@/core/model/CreateWalletType'
 import {walletStyleSheetType} from '@/config/view/wallet.ts'
-import {MultisigAccountInfo} from 'nem2-sdk'
 import TheWalletAdd from '@/views/wallet/wallet-switch/the-wallet-add/TheWalletAdd.vue'
 import TheWalletDelete from '@/views/wallet/wallet-switch/the-wallet-delete/TheWalletDelete.vue'
 import MnemonicDialog from '@/views/wallet/wallet-details/mnemonic-dialog/MnemonicDialog.vue'
 import NumberFormatting from '@/components/number-formatting/NumberFormatting.vue'
+import {BalancesService} from '@/core/services'
+import {APP_PARAMS, Message} from '@/config'
 
 @Component({
   components: {
@@ -50,17 +51,14 @@ export class WalletSwitchTs extends Vue {
     return this.activeAccount.networkCurrency
   }
 
+  getBalanceFromAddress(wallet: AppWallet): string {
+    return BalancesService.getBalanceFromAddress(wallet, this.$store)
+  }
+
   getWalletStyle(item: AppWallet): string {
     if (item.address === this.activeAddress) return walletStyleSheetType.activeWallet
     if (item.sourceType === CreateWalletType.seed) return walletStyleSheetType.seedWallet
     return walletStyleSheetType.otherWallet
-  }
-
-  // @AppWallet: should be an AppWallet computed property
-  isMultisig(address: string): boolean {
-    const multisigAccountInfo: MultisigAccountInfo = this.activeAccount.multisigAccountInfo[address]
-    if (!multisigAccountInfo) return false
-    return multisigAccountInfo.cosignatories.length > 0
   }
 
   switchWallet(newActiveWalletAddress) {
@@ -88,6 +86,17 @@ export class WalletSwitchTs extends Vue {
     }
 
     this.showMnemonicDialog = true
+  }
+
+  checkBeforeShowWalletAdd(){
+    const seedPathList = this.walletList.filter(item => item.sourceType == CreateWalletType.seed)
+    const numberOfSeedPath = seedPathList.length
+    if (numberOfSeedPath >= APP_PARAMS.MAX_SEED_WALLETS_NUMBER) {
+      Notice.trigger(Message.SEED_WALLET_OVERFLOW_ERROR, NoticeType.error, this.$store)
+      this.showWalletAdd = false
+      return
+    }
+    this.showWalletAdd = true
   }
 
   @Watch('activeAddress')

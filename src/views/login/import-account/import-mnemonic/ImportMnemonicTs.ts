@@ -1,9 +1,10 @@
-import {Vue, Component} from 'vue-property-decorator'
+import {Vue, Component, Provide} from 'vue-property-decorator'
 import {AppInfo, AppWallet, StoreAccount, AppAccounts, HdWallet} from '@/core/model'
+import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
 import {Password} from 'nem2-sdk'
 import {mapState} from 'vuex'
 import {Message} from '@/config'
-
+import {validation} from '@/core/validation'
 @Component({
   computed: {
     ...mapState({
@@ -11,8 +12,13 @@ import {Message} from '@/config'
       app: 'app',
     }),
   },
+  components:{
+    ErrorTooltip,
+  },
 })
 export default class ImportMnemonicTs extends Vue {
+  @Provide() validator: any = this.$validator
+  validation = validation
   seed = ''
   activeAccount: StoreAccount
   app: AppInfo
@@ -25,42 +31,29 @@ export default class ImportMnemonicTs extends Vue {
     return this.activeAccount.currentAccount.networkType
   }
 
-
   get password() {
     return this.activeAccount.temporaryLoginInfo.password
   }
 
-  checkSeed() {
-    const {seed, networkType} = this
-    if (!seed || !seed.trim()) {
-      this.$Notice.error({title: `${this.$t(Message.INPUT_EMPTY_ERROR)}`})
-      return false
-    }
-    try {
-      HdWallet.getAccountFromPathNumber(seed, 0, networkType) // use for check mnemonic
-    } catch (e) {
-      this.$Notice.error({title: 'Invalid mnemonic'})
-      return false
-    }
-
-    return true
-  }
-
   submit() {
-    if (!this.checkSeed()) return
     const {seed, password} = this
-    try {
-      new AppWallet().createAccountFromMnemonic(
-        new Password(password),
-        seed,
-        this.$store,
-      )
-      this.$store.commit('SET_TEMPORARY_MNEMONIC', this.seed)
-      this.$router.push('walletChoose')
-    } catch (error) {
-      this.$Notice.error({title: 'Creation failed'})
-      throw new Error(error)
-    }
+    this.$validator
+      .validate()
+      .then((valid) => {
+        if (!valid) return
+        try {
+          new AppWallet().createAccountFromMnemonic(
+            new Password(password),
+            seed,
+            this.$store,
+          )
+          this.$store.commit('SET_TEMPORARY_MNEMONIC', this.seed)
+          this.$router.push('walletChoose')
+        } catch (error) {
+          this.$Notice.error({title: `${this.$t('Creation_failed')}`})
+          throw new Error(error)
+        }
+      })
   }
 
   goToCreateAccountInfo() {

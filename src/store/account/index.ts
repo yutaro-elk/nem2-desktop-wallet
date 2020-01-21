@@ -1,34 +1,40 @@
 import Vue from 'vue'
-import {MutationTree} from 'vuex'
+import {MutationTree, ActionTree} from 'vuex'
+import {getters} from '@/store/account/accountGetters.ts'
 import {defaultNetworkConfig} from '@/config/index'
 import {
   AddressAndNamespaces, AddressAndMosaics,
-  AddressAndMultisigInfo, StoreAccount, AppMosaic, NetworkCurrency,
-  AppWallet, AppNamespace, FormattedTransaction, CurrentAccount,
+  AddressAndMultisigGraphInfo, StoreAccount,
+  AppMosaic, NetworkCurrency, AppWallet,
+  AppNamespace, FormattedTransaction,
+  CurrentAccount, Balances, AppState,
 } from '@/core/model'
 import {localRead, localSave} from '@/core/utils'
-import {NetworkType} from 'nem2-sdk'
+import {NetworkType, AccountHttp, Address} from 'nem2-sdk'
+import {BalancesService} from '@/core/services/mosaics/BalancesService'
 
 const state: StoreAccount = {
-  node: '',
   wallet: null,
+  activeMultisigAccount: null,
+  balances: {},
   mosaics: {},
   namespaces: [],
-  addressAliasMap: {},
   transactionList: [],
-  currentAccount: CurrentAccount.default(),
   transactionsToCosign: [],
-  activeMultisigAccount: null,
-  multisigAccountsMosaics: {},
-  multisigAccountsNamespaces: {},
-  multisigAccountsTransactions: {},
-  multisigAccountInfo: {},
-  networkCurrency: defaultNetworkConfig.defaultNetworkMosaic,
-  networkMosaics: {},
   temporaryLoginInfo: {
     password: null,
     mnemonic: null,
   },
+
+  // Properties to move out
+  currentAccount: CurrentAccount.default(),
+  multisigAccountsMosaics: {},
+  multisigAccountsNamespaces: {},
+  multisigAccountsTransactions: {},
+  multisigAccountGraphInfo: {},
+  networkCurrency: defaultNetworkConfig.defaultNetworkMosaic,
+  networkMosaics: {},
+  node: '',
 }
 
 const updateMosaics = (state: StoreAccount, mosaics: AppMosaic[]) => {
@@ -54,7 +60,6 @@ const mutations: MutationTree<StoreAccount> = {
     state.wallet = null
     state.mosaics = {}
     state.namespaces = []
-    state.addressAliasMap = {}
     state.transactionList = []
     state.currentAccount = CurrentAccount.default()
   },
@@ -119,12 +124,6 @@ const mutations: MutationTree<StoreAccount> = {
     activeNodeMap[networkType] = node
     localSave('activeNodeMap', JSON.stringify(activeNodeMap))
   },
-  SET_ADDRESS_ALIAS_MAP(state: StoreAccount, addressAliasMap: any): void {
-    state.addressAliasMap = addressAliasMap
-  },
-  SET_WALLET_BALANCE(state: StoreAccount, balance: number) {
-    state.wallet.balance = balance
-  },
   RESET_TRANSACTION_LIST(state: StoreAccount) {
     state.transactionList = []
   },
@@ -149,9 +148,9 @@ const mutations: MutationTree<StoreAccount> = {
   SET_ACCOUNT_DATA(state: StoreAccount, currentAccount: CurrentAccount) {
     state.currentAccount = currentAccount
   },
-  SET_MULTISIG_ACCOUNT_INFO(state: StoreAccount, addressAndMultisigInfo: AddressAndMultisigInfo) {
-    const {address, multisigAccountInfo} = addressAndMultisigInfo
-    Vue.set(state.multisigAccountInfo, address, multisigAccountInfo)
+  SET_MULTISIG_ACCOUNT_GRAPH_INFO(state: StoreAccount, addressAndMultisigInfo: AddressAndMultisigGraphInfo) {
+    const {address, multisigAccountGraphInfo} = addressAndMultisigInfo
+    Vue.set(state.multisigAccountGraphInfo, address, multisigAccountGraphInfo)
   },
   SET_ACTIVE_MULTISIG_ACCOUNT(state: StoreAccount, publicKey: string) {
     if (publicKey === state.wallet.publicKey) {
@@ -181,8 +180,11 @@ const mutations: MutationTree<StoreAccount> = {
   POP_TRANSACTION_TO_COSIGN_BY_HASH(state: StoreAccount, hash: string) {
     state.transactionsToCosign = popTransactionToCosignByHash([...state.transactionsToCosign], hash)
   },
-  SET_TRANSACTIONS_TO_COSIGN(state: StoreAccount, transactions: FormattedTransaction[]) {
-    state.transactionsToCosign = transactions
+  ADD_TRANSACTIONS_TO_COSIGN(state: StoreAccount, transactions: FormattedTransaction[]) {
+    const newTxHashes = [...transactions].map(({rawTx}) => rawTx.transactionInfo.hash)
+    const oldTransactionsToCosign = [...state.transactionsToCosign]
+      .filter(({rawTx}) => newTxHashes.indexOf(rawTx.transactionInfo.hash) === -1)
+    state.transactionsToCosign = [ ...transactions, ...oldTransactionsToCosign ]
   },
   SET_TEMPORARY_PASSWORD(state: StoreAccount, password: string) {
     state.temporaryLoginInfo.password = password
@@ -207,9 +209,17 @@ const mutations: MutationTree<StoreAccount> = {
   }) {
     state.wallet.temporaryRemoteNodeConfig = temporaryRemoteNodeConfig
   },
+
+  SET_ACCOUNTS_BALANCES(state: StoreAccount, balances: Record <string, Balances>) {
+    state.balances = balances
+  },
+
+  SET_ACCOUNT_BALANCES(state, { address, balances }) {
+    Vue.set(state.balances, address, balances)
+  },
 }
 
-const actions = {
+const actions: ActionTree<any, AppState> = {
   SET_GENERATION_HASH({commit, rootState}, {endpoint, generationHash}) {
     if (endpoint !== rootState.account.node) return
     commit('SET_GENERATION_HASH', generationHash)
@@ -226,8 +236,29 @@ const actions = {
     if (endpoint !== rootState.account.node) return
     commit('UPDATE_MOSAICS', appMosaics)
   },
+  ADD_UNCONFIRMED_TRANSACTION({commit}, transaction: FormattedTransaction) {
+    commit('POP_TRANSACTION_TO_COSIGN_BY_HASH', transaction)
+    commit('ADD_UNCONFIRMED_TRANSACTION', transaction)
+  },
+  ADD_CONFIRMED_TRANSACTION({commit}, transaction: FormattedTransaction) {
+    commit('POP_TRANSACTION_TO_COSIGN_BY_HASH', transaction)
+    commit('ADD_CONFIRMED_TRANSACTION', transaction)
+  },
+  async SET_ACCOUNTS_BALANCES({commit, rootState}) {
+    const {walletList} = rootState.app
+    const {node} = rootState.account
+    const plainAddresses = walletList.map(({address}) => Address.createFromRawAddress(address))
+    const accountsInfo = await new AccountHttp(node)
+      .getAccountsInfo(plainAddresses)
+      .toPromise()
+
+    const balances = BalancesService.getFromAccountsInfo(accountsInfo)
+    
+    commit('SET_ACCOUNTS_BALANCES', balances)
+  },
 }
 
 export const accountState = {state}
 export const accountMutations = {mutations}
 export const accountActions = {actions}
+export const accountGetters = {getters}

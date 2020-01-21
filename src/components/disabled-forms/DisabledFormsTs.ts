@@ -1,5 +1,5 @@
 import {Component, Vue} from 'vue-property-decorator'
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {AppInfo, StoreAccount} from '@/core/model'
 import {Message} from '@/config'
 
@@ -9,22 +9,20 @@ import {Message} from '@/config'
       activeAccount: 'account',
       app: 'app',
     }),
+    ...mapGetters({
+      isMultisig: 'isMultisig',
+    }),
   },
 })
 export class DisabledFormsTs extends Vue {
   activeAccount: StoreAccount
   app: AppInfo
+  isMultisig: boolean
 
   get hasNetworkCurrency(): boolean {
     return Boolean(this.app
         && this.app.networkProperties
         && this.app.networkProperties.generationHash)
-  }
-
-  get isMultisig(): boolean {
-    const {address} = this.activeAccount.wallet
-    const {multisigAccountInfo} = this.activeAccount
-    return multisigAccountInfo[address] && multisigAccountInfo[address].cosignatories.length > 0
   }
 
   get active(): boolean {

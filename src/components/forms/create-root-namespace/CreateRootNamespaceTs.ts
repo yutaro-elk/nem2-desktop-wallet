@@ -1,7 +1,7 @@
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {
-  PublicAccount, MultisigAccountInfo, NetworkType, Address,
-  NamespaceRegistrationTransaction, UInt64, Deadline,
+  NetworkType, UInt64, Deadline,
+  NamespaceRegistrationTransaction, 
 } from 'nem2-sdk'
 import {Component, Vue, Watch, Provide} from 'vue-property-decorator'
 import {DEFAULT_FEES, FEE_GROUPS, formDataConfig, networkConfig} from '@/config'
@@ -26,16 +26,26 @@ import SignerSelector from '@/components/forms/inputs/signer-selector/SignerSele
       activeAccount: 'account',
       app: 'app',
     }),
+    ...mapGetters({
+      isCosignatory: 'isCosignatory',
+      announceInLock: 'announceInLock',
+      multisigAccountGraphInfo: 'multisigAccountGraphInfo',
+      activeMultisigAccountMultisigAccountInfo: 'activeMultisigAccountMultisigAccountInfo',
+    }),
   },
 })
 export class CreateRootNamespaceTs extends Vue {
   @Provide() validator: any = this.$validator
   activeAccount: StoreAccount
   app: AppInfo
+  announceInLock: boolean
+  isCosignatory: boolean
   transactionList = []
   formItems = cloneData(formDataConfig.rootNamespaceForm)
   formatAddress = formatAddress
   validation = validation
+  activeMultisigAccountMultisigAccountInfo
+  multisigAccountGraphInfo
 
   get wallet(): AppWallet {
     return this.activeAccount.wallet
@@ -43,38 +53,6 @@ export class CreateRootNamespaceTs extends Vue {
 
   get activeMultisigAccount(): string {
     return this.activeAccount.activeMultisigAccount
-  }
-
-  get announceInLock(): boolean {
-    const {activeMultisigAccount, networkType} = this
-    if (!this.activeMultisigAccount) return false
-    const address = Address.createFromPublicKey(activeMultisigAccount, networkType).plain()
-    return this.activeAccount.multisigAccountInfo[address].minApproval > 1
-  }
-
-  get multisigInfo(): MultisigAccountInfo {
-    const {address} = this.wallet
-    return this.activeAccount.multisigAccountInfo[address]
-  }
-
-  get hasMultisigAccounts(): boolean {
-    if (!this.multisigInfo) return false
-    return this.multisigInfo.multisigAccounts.length > 0
-  }
-
-  get multisigPublicKeyList(): {publicKey: string, address: string}[] {
-    if (!this.hasMultisigAccounts) return null
-    return [
-      {
-        publicKey: this.accountPublicKey,
-        address: `(self) ${formatAddress(this.address)}`,
-      },
-      ...this.multisigInfo.multisigAccounts
-        .map(({publicKey}) => ({
-          publicKey,
-          address: formatAddress(Address.createFromPublicKey(publicKey, this.networkType).plain()),
-        })),
-    ]
   }
 
   get address(): string {
@@ -97,16 +75,8 @@ export class CreateRootNamespaceTs extends Vue {
     return this.activeAccount.node
   }
 
-  get multisigAccountInfo(): MultisigAccountInfo {
-    return this.activeAccount.multisigAccountInfo[this.wallet.address]
-  }
-
   get accountPublicKey(): string {
     return this.activeAccount.wallet.publicKey
-  }
-
-  get multisigAccounts(): PublicAccount[] {
-    return this.multisigAccountInfo ? this.multisigAccountInfo.multisigAccounts : []
   }
 
   get defaultFees(): DefaultFee[] {
@@ -151,7 +121,6 @@ export class CreateRootNamespaceTs extends Vue {
     const {multisigPublicKey} = this.formItems
     const {networkType} = this.wallet
     const fee = feeAmount / 3
-
     const rootNamespaceTransaction = this.createRootNamespace()
 
     if (this.announceInLock) {
@@ -177,7 +146,7 @@ export class CreateRootNamespaceTs extends Vue {
   confirmViaTransactionConfirmation() {
     if (this.activeMultisigAccount) {
       this.createByMultisig()
-    } else {
+    } else { 
       this.createBySelf()
     }
 

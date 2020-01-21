@@ -1,8 +1,11 @@
 import {Store} from 'vuex'
-import {Transaction} from 'nem2-sdk'
-import {FormattedTransaction, TransactionCategories, TransactionStatusGroups} from '@/core/model'
-import {AppState, TransactionFormatterOptions} from '@/core/model'
+import {Transaction, Address, AggregateTransaction} from 'nem2-sdk'
+import {
+  AppState, TransactionFormatterOptions,
+  FormattedTransaction, TransactionCategories, TransactionStatusGroups,
+} from '@/core/model'
 import {transactionTypeToFormattedTransaction} from '@/core/services/transactions/transactionTypeToFormattedTransaction.ts'
+import {GraphInfoService} from '../multisig'
 
 export class TransactionFormatter {
   private readonly transactionTypeRouter = transactionTypeToFormattedTransaction
@@ -10,6 +13,20 @@ export class TransactionFormatter {
 
   public static create(store: Store<AppState>) {
     return new TransactionFormatter(store)
+  }
+
+  formatAndSavePartialTransactions(
+    transactions: AggregateTransaction[],
+    address: Address,
+    options?: TransactionFormatterOptions,
+  ) {
+    const newTx = GraphInfoService.getTransactionsToCosignFromTransactionList(
+      address,
+      [...transactions],
+      this.store.getters.multisigAccountGraphInfo,
+    ) 
+
+    return this.formatAndSaveTransactions(newTx as Transaction[], options)
   }
 
   formatAndSaveTransactions(
@@ -24,7 +41,7 @@ export class TransactionFormatter {
     }
 
     if (options.transactionCategory && options.transactionCategory === TransactionCategories.TO_COSIGN) {
-      this.store.commit('SET_TRANSACTIONS_TO_COSIGN', formattedTransactions)
+      this.store.commit('ADD_TRANSACTIONS_TO_COSIGN', formattedTransactions)
       return
     }
 
@@ -48,11 +65,11 @@ export class TransactionFormatter {
     const formattedTransaction = this.formatTransaction(transaction, options)
 
     if (formattedTransaction.transactionStatusGroup === TransactionStatusGroups.unconfirmed) {
-      this.store.commit('ADD_UNCONFIRMED_TRANSACTION', formattedTransaction)
+      this.store.dispatch('ADD_UNCONFIRMED_TRANSACTION', formattedTransaction)
       return
     }
 
-    this.store.commit('ADD_CONFIRMED_TRANSACTION', formattedTransaction)
+    this.store.dispatch('ADD_CONFIRMED_TRANSACTION', formattedTransaction)
   }
 
   formatTransactions(

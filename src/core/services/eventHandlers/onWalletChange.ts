@@ -66,13 +66,17 @@ export class OnWalletChange {
 
   private async setWalletDataFromNetwork() {
     const {newWallet, store} = this
+    const {partialTransactionsFetcher} = store.state.app
+    partialTransactionsFetcher.kill()
     await newWallet.setAccountInfo(store)
-    if(!newWallet.isKnownByTheNetwork) return
-    await newWallet.setMultisigStatus(store.state.account.node, store)
+    const {walletKnownByNetwork} = await newWallet.setAccountInfo(store)
+    if (!walletKnownByNetwork) return
+    await newWallet.setMultisigStatus(store)
     await setMosaics(newWallet, store)
     await setNamespaces(newWallet.address, store)
     await newWallet.setTransactionList(store)
     newWallet.setPartialTransactions(store)
+    partialTransactionsFetcher.startFetchingRound()
   }
 
   private startListeners() {

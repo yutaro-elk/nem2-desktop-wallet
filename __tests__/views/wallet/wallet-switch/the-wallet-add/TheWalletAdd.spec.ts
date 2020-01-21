@@ -9,7 +9,6 @@ import {accountState} from '@/store/account'
 import {appMutations, appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import {
-  multisigAccountInfo,
   mosaics,
   networkCurrency,
   hdAccount,
@@ -43,7 +42,6 @@ describe('WalletSwitch', () => {
             wallet: hdAccount.wallets[0],
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
             accountName: hdAccount.accountName,
           }),
         },
@@ -90,8 +88,4 @@ describe('WalletSwitch', () => {
     expect(wrapper.vm.pathToCreate).toBe(2)
   })
 
-  it('the initial pathToCreate should return 2', () => {
-    wrapper.vm.$store.commit('SET_WALLET_LIST', [...Array(10)].map(() => hdAccount.wallets[0]))
-    expect(wrapper.vm.pathToCreate).toBe(undefined)
-  })
 })

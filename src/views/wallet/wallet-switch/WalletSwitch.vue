@@ -23,16 +23,13 @@
                   {{ item.name }}
                 </p>
                 <p class="walletAmount overflow_ellipsis">
-                  <NumberFormatting :number-of-formatting="item.balance ? formatNumber(item.balance) : '0' " />
+                  <NumberFormatting :number-of-formatting="getBalanceFromAddress(item)" />
                   <span class="tails">{{ networkCurrency.ticker }}</span>
                 </p>
               </div>
             </i-col>
             <i-col span="9">
               <div @click.stop>
-                <div class="walletTypeTxt">
-                  {{ isMultisig(item.address) ? $t('Public_account') : '' }}
-                </div>
                 <div class="options">
                   <span class="mosaics">
                     <Icon type="logo-buffer" />
@@ -55,7 +52,7 @@
     <div class="walletMethod">
       <Row>
         <i-col span="12">
-          <div class="createBtn pointer" @click="showWalletAdd = true">
+          <div class="createBtn pointer" @click="checkBeforeShowWalletAdd">
             {{ $t('from_seed') }}
           </div>
         </i-col>

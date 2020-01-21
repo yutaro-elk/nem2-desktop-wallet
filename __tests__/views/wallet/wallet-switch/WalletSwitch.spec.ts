@@ -6,10 +6,9 @@ import VeeValidate from 'vee-validate'
 // @ts-ignore
 import WalletSwitch from '@/views/wallet/wallet-switch/WalletSwitch.vue'
 import {accountState} from '@/store/account'
-import {appState} from '@/store/app'
+import {appMutations, appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import {
-  multisigAccountInfo,
   mosaics,
   networkCurrency,
   hdAccount,
@@ -43,7 +42,6 @@ describe('WalletSwitch', () => {
             wallet: hdAccount.wallets[0],
             mosaics,
             networkCurrency,
-            multisigAccountInfo,
             accountName: hdAccount.accountName,
           }),
         },
@@ -51,6 +49,7 @@ describe('WalletSwitch', () => {
           state: Object.assign(appState.state, {
             walletList: hdAccount.wallets,
           }),
+          mutations: appMutations.mutations,
         },
       },
     })
@@ -74,4 +73,9 @@ describe('WalletSwitch', () => {
     expect(wrapper).not.toBeNull()
   })
 
+  it('should not create seed wallet while seed wallets is more than 10', () => {
+    wrapper.vm.$store.commit('SET_WALLET_LIST', [...Array(10)].map(() => hdAccount.wallets[0]))
+    wrapper.vm.checkBeforeShowWalletAdd()
+    expect(wrapper.vm.showWalletAdd).toBe(false)
+  })
 })

@@ -1,11 +1,11 @@
 import {copyTxt} from '@/core/utils'
 import {ContactQR} from 'nem2-qr-library'
-import {AliasType, MultisigAccountInfo, PublicAccount} from 'nem2-sdk'
+import {AliasType, PublicAccount} from 'nem2-sdk'
 import {Component, Vue} from 'vue-property-decorator'
 import KeystoreDialog from '@/views/wallet/wallet-details/keystore-dialog/KeystoreDialog.vue'
 import PrivatekeyDialog from '@/views/wallet/wallet-details/privatekey-dialog/PrivatekeyDialog.vue'
 import WalletHarvesting from '@/views/wallet/wallet-details/wallet-function/wallet-harvesting/WalletHarvesting.vue'
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {AppWallet, AppInfo, StoreAccount, AppNamespace} from '@/core/model'
 import failureIcon from '@/common/img/monitor/failure.png'
 import Alias from '@/components/forms/alias/Alias.vue'
@@ -27,6 +27,10 @@ import TheWalletDelete from '@/views/wallet/wallet-switch/the-wallet-delete/TheW
     ...mapState({
       activeAccount: 'account',
       app: 'app',
+    }),
+    ...mapGetters({
+      isMultisig: 'isMultisig',
+      isCosignatory: 'isCosignatory',
     }),
   },
   subscriptions() {
@@ -54,20 +58,11 @@ export class WalletDetailsTs extends Vue {
   activeNamespace: AppNamespace = null
   showUpdateDialog = false
   showDeleteDialog = false
+  isMultisig: boolean
+  isCosignatory: boolean
 
   get wallet(): AppWallet {
     return this.activeAccount.wallet
-  }
-
-  get isMultisig(): boolean {
-    const multisigAccountInfo: MultisigAccountInfo = this.activeAccount.multisigAccountInfo[this.wallet.address]
-    if (!multisigAccountInfo) return false
-    return multisigAccountInfo.cosignatories.length > 0
-  }
-  get isCosignatory(){
-    const multisigAccountInfo: MultisigAccountInfo = this.activeAccount.multisigAccountInfo[this.wallet.address]
-    if (!multisigAccountInfo) return false
-    return multisigAccountInfo.multisigAccounts.length > 0
   }
 
   // @TODO: false should not be an option, if false occurs, then it is a reactivity bug

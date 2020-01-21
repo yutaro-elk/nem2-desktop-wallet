@@ -13,7 +13,6 @@ import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -67,7 +66,6 @@ describe('GenerateMnemonic', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             temporaryLoginInfo: {password: 'password'},
             currentAccount: {
               networkType: NetworkType.TEST_NET,

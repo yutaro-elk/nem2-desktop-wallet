@@ -1,6 +1,6 @@
 import {NamespaceHttp, Address, QueryParams, NamespaceId} from 'nem2-sdk'
 import {AppNamespace, AppState, FormattedTransaction, FormattedAggregateComplete} from '@/core/model'
-import {flattenArrayOfStrings} from '@/core/utils'
+import {flattenArray} from '@/core/utils'
 import {Store} from 'vuex'
 
 
@@ -60,7 +60,7 @@ export const handleRecipientAddressAsNamespaceId = async ( transactions: Formatt
 
     const {node, namespaces} = store.state.account
         
-    const newNamespacesIds = flattenArrayOfStrings(namespaceIds)
+    const newNamespacesIds = flattenArray(namespaceIds)
       .filter(x => x)                            
       .map(x => x.toHex())
       .filter(x => namespaces.find(({hex}) => hex === x) === undefined)

@@ -10,5 +10,5 @@ import {MULTISIG_FORM_MODES} from '@/core/model'
   components: { MultisigAccountModification },
   data() { return { MULTISIG_FORM_MODES }},
 })
-export default class MultisigModification extends Vue {}
+export default class MultisigConversion extends Vue {}
 </script>

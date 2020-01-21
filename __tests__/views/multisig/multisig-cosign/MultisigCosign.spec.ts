@@ -5,13 +5,11 @@ import Vuex from 'vuex'
 import VeeValidate from 'vee-validate'
 // @ts-ignore
 import MultisigCosign from '@/views/multisig/multisig-cosign/MultisigCosign.vue'
-import {accountMutations, accountState} from '@/store/account'
+import {accountMutations, accountState, accountGetters} from '@/store/account'
 import {appMutations, appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
 import {
-  mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -32,40 +30,46 @@ localVue.directive('focus', {
 // close warning
 config.logModifiedComponents = false
 
-describe('MultisigCosign', () => {
-  let store
-  let wrapper
-  beforeEach(() => {
-    store = store = new Vuex.Store({
-      modules: {
-        account: {
-          state: Object.assign(accountState.state, {
-            wallet: AppWallet.createFromDTO(CosignWallet),
-            mosaics,
-            multisigAccountInfo,
-          }),
-          mutations: accountMutations.mutations,
-        },
-        app: {
-          state: Object.assign(appState.state, {mosaicsLoading}),
-          mutations: appMutations.mutations,
-        },
-      },
+const mockStartFetchingRound = jest.fn()
+const mockPartialTransactionFetcher = {
+  startFetchingRound: mockStartFetchingRound,
+}
+
+const mockStore = new Vuex.Store({
+  modules: {
+    account: {
+      state: Object.assign(accountState.state, {
+        wallet: AppWallet.createFromDTO(CosignWallet),
+        mosaics,
+      }),
+      mutations: accountMutations.mutations,
+      getters: accountGetters.getters,
     },
-    )
-    wrapper = shallowMount(MultisigCosign, {
+    app: {
+      state: {
+        ...appState.state, 
+        partialTransactionsFetcher: mockPartialTransactionFetcher,
+      },
+      mutations: appMutations.mutations,
+    },
+  },
+})
+
+describe('MultisigCosign', () => {
+  beforeEach(() => {
+    mockStartFetchingRound.mockClear()
+    shallowMount(MultisigCosign, {
       sync: false,
       mocks: {
         $t: (msg) => msg,
       },
       localVue,
-      store,
+      store: mockStore,
       router,
     })
-  },
-  )
+  })
 
-  it('Component MultisigCosign is not null ', () => {
-    expect(wrapper).not.toBeNull()
+  it('Should call partialTransactionsFetcher.startFetchingRound', () => {
+    expect(mockStartFetchingRound).toBeCalledTimes(1)
   })
 })

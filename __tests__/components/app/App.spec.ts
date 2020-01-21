@@ -8,7 +8,7 @@ import {accountMutations, accountState, accountActions} from '@/store/account'
 import {appMutations, appState, appActions} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
-import {mosaicsLoading, multisigAccountInfo, mosaics, MultisigWallet,
+import {mosaicsLoading, mosaics, MultisigWallet,
 } from '@MOCKS/index'
 import {NetworkProperties, NetworkManager, Listeners, Notice, NoticeType} from '@/core/model'
 import {setMarketOpeningPrice, TransactionFormatter} from '@/core/services'
@@ -48,7 +48,6 @@ describe('App', () => {
           state: Object.assign(accountState.state, {
             wallet: MultisigWallet,
             mosaics,
-            multisigAccountInfo,
           }),
           actions: accountActions.actions,
           mutations: accountMutations.mutations,

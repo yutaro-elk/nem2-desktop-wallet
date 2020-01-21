@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 import VeeValidate from 'vee-validate'
 // @ts-ignore
 import MosaicCreation from '@/components/forms/mosaic-creation/MosaicCreation.vue'
-import {accountMutations, accountState} from '@/store/account'
+import {accountMutations, accountState, accountGetters} from '@/store/account'
 import {appMutations, appState} from '@/store/app'
 import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
@@ -18,8 +18,8 @@ import {
   TransactionType,
 } from 'nem2-sdk'
 import {
+  cosignWalletMultisigAccountGraphInfo,
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   MultisigAccount,
   Multisig2Account,
@@ -51,9 +51,12 @@ describe('MosaicCreation', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
+            multisigAccountGraphInfo: {
+              [CosignWallet.address]: cosignWalletMultisigAccountGraphInfo,
+            },
           }),
           mutations: accountMutations.mutations,
+          getters: accountGetters.getters,
         },
         app: {
           state: Object.assign(appState.state, {mosaicsLoading}),

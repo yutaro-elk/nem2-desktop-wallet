@@ -13,7 +13,6 @@ import {AppWallet} from '@/core/model'
 import VueRx from 'vue-rx'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -62,7 +61,6 @@ describe('FinishCreate', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             currentAccount: {
               networkType: NetworkType.TEST_NET,
               name: 'current account name',
@@ -97,7 +95,7 @@ describe('FinishCreate', () => {
     wrapper.vm.submit()
     expect(AppWallet).toHaveBeenCalledTimes(1)
     expect(mockCreateFromMnemonicCall.mock.calls[0][0]).toStrictEqual([
-      'SeedWallet',
+      'SeedWallet-1',
       new Password('password'),
       expectedMnemonic,
       NetworkType.TEST_NET,

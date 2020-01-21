@@ -12,6 +12,7 @@ import {
 } from '@/core/model'
 
 const mockCommit = jest.fn()
+const mockDispatch = jest.fn()
 
 const mockGetTimeFromBlockNumber = jest.fn()
 const mockNetworkProperties = {
@@ -29,6 +30,7 @@ const mockStore = {
     },
   },
   commit: mockCommit,
+  dispatch: mockDispatch,
 }
 
 const registerNamespaceTransaction = NamespaceRegistrationTransaction.createRootNamespace(
@@ -71,6 +73,7 @@ const mosaicAliasTransaction = MosaicAliasTransaction.create(
 describe('TransactionFormatter', () => {
   beforeEach(() => {
     mockCommit.mockClear()
+    mockDispatch.mockClear()
   })
 
   it('when no options is provided, SET_TRANSACTION_LIST should be called', () => {
@@ -89,7 +92,7 @@ describe('TransactionFormatter', () => {
     expect(mockCommit.mock.calls[0][1][3]).toBeInstanceOf(FormattedMosaicAlias)
   })
 
-  it('should call SET_TRANSACTIONS_TO_COSIGN', () => {
+  it('should call ADD_TRANSACTIONS_TO_COSIGN', () => {
   // @ts-ignore 
     TransactionFormatter.create(mockStore).formatAndSaveTransactions([
       registerNamespaceTransaction,
@@ -98,7 +101,7 @@ describe('TransactionFormatter', () => {
       mosaicAliasTransaction,
     ], {transactionCategory: TransactionCategories.TO_COSIGN})
 
-    expect(mockCommit.mock.calls[0][0]).toBe('SET_TRANSACTIONS_TO_COSIGN')
+    expect(mockCommit.mock.calls[0][0]).toBe('ADD_TRANSACTIONS_TO_COSIGN')
     expect(mockCommit.mock.calls[0][1][0]).toBeInstanceOf(FormattedRegisterNamespace)
     expect(mockCommit.mock.calls[0][1][1]).toBeInstanceOf(FormattedTransfer)
     expect(mockCommit.mock.calls[0][1][2]).toBeInstanceOf(FormattedTransfer)
@@ -126,8 +129,8 @@ describe('TransactionFormatter', () => {
     TransactionFormatter.create(mockStore).formatAndSaveNewTransaction(
       registerNamespaceTransaction)
 
-    expect(mockCommit.mock.calls[0][0]).toBe('ADD_CONFIRMED_TRANSACTION')
-    expect(mockCommit.mock.calls[0][1]).toBeInstanceOf(FormattedRegisterNamespace)
+    expect(mockDispatch.mock.calls[0][0]).toBe('ADD_CONFIRMED_TRANSACTION')
+    expect(mockDispatch.mock.calls[0][1]).toBeInstanceOf(FormattedRegisterNamespace)
   })
 
   it('should call ADD_UNCONFIRMED_TRANSACTION', () => {
@@ -136,7 +139,7 @@ describe('TransactionFormatter', () => {
       registerNamespaceTransaction,
       {transactionStatusGroup: TransactionStatusGroups.unconfirmed})
 
-    expect(mockCommit.mock.calls[0][0]).toBe('ADD_UNCONFIRMED_TRANSACTION')
-    expect(mockCommit.mock.calls[0][1]).toBeInstanceOf(FormattedRegisterNamespace)
+    expect(mockDispatch.mock.calls[0][0]).toBe('ADD_UNCONFIRMED_TRANSACTION')
+    expect(mockDispatch.mock.calls[0][1]).toBeInstanceOf(FormattedRegisterNamespace)
   })
 })

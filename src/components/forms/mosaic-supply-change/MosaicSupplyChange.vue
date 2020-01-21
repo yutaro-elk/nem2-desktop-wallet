@@ -12,7 +12,7 @@
       <DisabledForms />
 
       <div slot="header" class="mosaicEditDialogHeader">
-        <span class="title justify_text">{{ $t('modify_supply') }}</span>
+        <span class="title">{{ $t('modify_supply') }}</span>
       </div>
 
       <div class="mosaicEditDialogBody">
@@ -24,7 +24,7 @@
             @keyup.enter="submit"
           >
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('mosaic_ID') }}
               </div>
               <div class="input_area no-border">
@@ -33,7 +33,7 @@
             </div>
 
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('alias') }}
               </div>
               <div class="input_area no-border">
@@ -42,7 +42,7 @@
             </div>
 
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('existing_supply') }}
               </div>
               <div class="input_area no-border">
@@ -51,7 +51,7 @@
             </div>
 
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('New_supply') }}
               </div>
               <div class="input_area no-border">
@@ -69,7 +69,7 @@
             </div>
 
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('change_type') }}
               </div>
               <RadioGroup v-model="formItems.supplyType" class="input_radio">
@@ -83,7 +83,7 @@
             </div>
 
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('change_amount') }}
               </div>
               <div class="input_area">
@@ -101,7 +101,7 @@
             </div>
 
             <div class="input_content">
-              <div class="title justify_text">
+              <div class="title">
                 {{ $t('fee') }}
               </div>
               <div class="input_area">

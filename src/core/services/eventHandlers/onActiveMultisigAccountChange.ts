@@ -1,10 +1,8 @@
 import {Store} from 'vuex'
 import {NetworkType, Address, MosaicAmountView} from 'nem2-sdk'
 import {AppNamespace, AppMosaic, AppState} from '@/core/model'
-import {
-  getNamespacesFromAddress, mosaicsAmountViewFromAddress,
-  AppMosaics, setMultisigAccountMultisigAccountInfo,
-} from '..'
+import {getNamespacesFromAddress, mosaicsAmountViewFromAddress, AppMosaics} from '..'
+import {MultisigService} from '@/core/services'
 
 export class OnActiveMultisigAccountChange {
   private address: Address
@@ -32,7 +30,7 @@ export class OnActiveMultisigAccountChange {
     const {address, node, publicKey, store} = this
     const appNamespaces = await getNamespacesFromAddress(address.plain(), node)
     const mosaicAmountViews = await mosaicsAmountViewFromAddress(node, address)
-    await setMultisigAccountMultisigAccountInfo(publicKey, store)
+    MultisigService.updateAccountMultisigData(publicKey, store)
     this.setNamespaces(appNamespaces)
     this.setMosaics(mosaicAmountViews)
   }

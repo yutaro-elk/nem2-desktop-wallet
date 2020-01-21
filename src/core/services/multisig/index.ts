@@ -1,3 +1,5 @@
-export * from './methods'
+export * from './GraphInfoService'
+export * from './MultisigService'
 export * from './partialTransactions'
+export * from './PartialTransactionsFetcher'
 export * from './transactions'

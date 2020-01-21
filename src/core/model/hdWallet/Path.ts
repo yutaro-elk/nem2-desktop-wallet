@@ -15,7 +15,7 @@ export class Path {
   ): string {
     const path = new Path()
     path.validatePath(seedWalletPath)
-    
+
     if (remotePathIndex === 0) {
       throw new Error('The remote path index can not be 0')
     }
@@ -38,7 +38,7 @@ export class Path {
     if (
       typeof path !== 'string'
       || path.length !== 18
-    ) { 
+    ) {
       throw new Error(`invalid path: ${path}`)
     }
   }

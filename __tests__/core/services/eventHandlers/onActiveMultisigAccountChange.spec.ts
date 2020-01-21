@@ -1,9 +1,15 @@
 import {OnActiveMultisigAccountChange} from '@/core/services/eventHandlers/onActiveMultisigAccountChange.ts'
 import flushPromises from 'flush-promises'
-import {MultisigWallet} from '@MOCKS/index'
+import {MultisigWallet, current1Account} from '@MOCKS/index'
 import {NetworkType} from 'nem2-sdk'
+import {MultisigService} from '@/core/services'
 
-jest.mock('@/core/services/multisig/methods')
+jest.mock('@/core/services/multisig/MultisigService', () => ({
+  'MultisigService': {},
+}))
+
+const mockUpdateAccountMultisigData = jest.fn()
+MultisigService.updateAccountMultisigData = mockUpdateAccountMultisigData
 
 const mockMosaicsAmountViewFromAddressCall = jest.fn()
 jest.mock('@/core/services/namespace/methods')
@@ -30,6 +36,12 @@ const mockCommit = jest.fn()
 describe('OnActiveMultisigAccountChange', () => {
   it('should call all the methods', async (done) => {
     const store = {
+      state: {
+        account: {
+          node: 'http://endpoint:3000',
+          currentAccount: current1Account,
+        },
+      },
       commit: mockCommit,
     }
 
@@ -55,6 +67,7 @@ describe('OnActiveMultisigAccountChange', () => {
       address: MultisigWallet.address,
       mosaics: [],
     })
+    expect(mockUpdateAccountMultisigData).toHaveBeenCalledTimes(1)
     done()
   })
 })

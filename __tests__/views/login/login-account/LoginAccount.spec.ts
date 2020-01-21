@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 import VeeValidate from 'vee-validate'
 // @ts-ignore
 import LoginAccount from '@/views/login/login-account/LoginAccount.vue'
-import {accountMutations, accountState} from '@/store/account'
+import {accountMutations, accountState, accountActions} from '@/store/account'
 import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
 import i18n from '@/language'
@@ -13,6 +13,9 @@ import {localSave} from '@/core/utils'
 import {hdAccount, hdAccountData} from '@MOCKS/index'
 import flushPromises from 'flush-promises'
 import {appMutations,appState} from '@/store/app'
+
+jest.mock('@/core/services/network/Endpoints.ts')
+jest.mock('@/core/services/eventHandlers/onLogin.ts')
 
 // @ts-ignore
 const localVue = createLocalVue()
@@ -41,6 +44,7 @@ describe('LoginAccount', () => {
         account: {
           state: accountState.state,
           mutations: accountMutations.mutations,
+          actions: accountActions.actions,
         },
         app:{
           state: appState.state,
@@ -59,8 +63,7 @@ describe('LoginAccount', () => {
       store,
       router,
     })
-  },
-  )
+  })
 
   it('should save account and node info in store while password is right', async (done) => {
     wrapper.vm.$nextTick(()=>{ wrapper.vm.$validator.reset()})

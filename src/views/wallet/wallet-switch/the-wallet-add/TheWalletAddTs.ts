@@ -3,7 +3,7 @@ import {Component, Vue, Prop, Provide} from 'vue-property-decorator'
 import {validation} from '@/core/validation'
 import {AppInfo, AppWallet, StoreAccount, Notice, NoticeType} from '@/core/model'
 import CheckPassword from '@/components/forms/check-password/CheckPassword.vue'
-import {seedWalletTitle, APP_PARAMS, Message} from '@/config'
+import {APP_PARAMS, Message} from '@/config'
 import {Password} from 'nem2-sdk'
 import ErrorTooltip from '@/components/other/forms/errorTooltip/ErrorTooltip.vue'
 
@@ -40,24 +40,21 @@ export class TheWalletAddTs extends Vue {
   }
 
   get pathToCreate() {
-    const seedPathList = this.walletList.filter(item => item.path).map(item => item.path[item.path.length - 8]).sort()
-    const numberOfSeedPath = seedPathList.length
-    if (numberOfSeedPath >= APP_PARAMS.MAX_SEED_WALLETS_NUMBER) {
-      Notice.trigger(Message.SEED_WALLET_OVERFLOW_ERROR, NoticeType.error, this.$store)
-      this.show = false
-      return
-    }
-
-    if (!numberOfSeedPath) return 0
-
+    const seedPathList = this.walletList.filter(item => item.path).map(item => {
+      // remove string before wallet index
+      const pathContent = item.path.substring(10)
+      // get wallet index without `
+      return pathContent.substring(0,pathContent.indexOf('/') - 1)
+    }).sort()
+    // get the min invalid index
     const jumpedPath = seedPathList
       .map(a => Number(a))
       .sort()
       .map((element, index) => {
-        if (element !== index) return index
+        if (element == index) return index
       })
       .filter(x => x !== undefined)
-    return jumpedPath.length ? jumpedPath[0] : numberOfSeedPath
+    return jumpedPath.length
   }
 
 
@@ -85,6 +82,6 @@ export class TheWalletAddTs extends Vue {
   }
 
   mounted() {
-    this.walletName = seedWalletTitle + this.pathToCreate
+    this.walletName = APP_PARAMS.SEED_WALLET_NAME_PREFIX + (this.pathToCreate + 1)
   }
 }

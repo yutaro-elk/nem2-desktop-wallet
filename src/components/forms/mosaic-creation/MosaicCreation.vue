@@ -7,10 +7,10 @@
           <div class="form_item">
             <span class="key">{{ $t('account') }}</span>
             <span
-              v-if="!hasMultisigAccounts"
+              v-if="!isCosignatory"
               class="value text_select"
             >{{ formatAddress(wallet.address) }}</span>
-            <ErrorTooltip v-if="hasMultisigAccounts" field-name="multisigPublicKey">
+            <ErrorTooltip v-if="isCosignatory" field-name="multisigPublicKey">
               <SignerSelector v-model="formItems.multisigPublicKey" />
             </ErrorTooltip>
           </div>
@@ -109,7 +109,7 @@
               <span class="end_label">{{ $t('duration') }}:{{ durationIntoDate }}</span>
             </span>
             <div class="tips">
-              {{ $t('namespace_duration_tip_1') }}
+              {{ $t('mosaic_duration_hint', {targetBlockTime, MAX_MOSAIC_DURATION_YEARS} ) }}
             </div>
           </div>
           <div v-if="false" class="form_item XEM_rent_fee">

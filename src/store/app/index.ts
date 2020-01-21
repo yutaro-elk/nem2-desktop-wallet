@@ -13,7 +13,7 @@ import {localRead, localSave} from '@/core/utils'
 import {MutationTree, Store} from 'vuex'
 import {explorerLinkList} from '@/config'
 import Vue from 'vue'
-import {TransactionFormatter, Endpoints} from '@/core/services'
+import {TransactionFormatter, Endpoints, PartialTransactionsFetcher} from '@/core/services'
 
 const state: AppInfo = {
   timeZone: new Date().getTimezoneOffset() / 60, // current time zone
@@ -44,6 +44,7 @@ const state: AppInfo = {
   transactionFormatter: null,
   listeners: null,
   networkManager: null,
+  partialTransactionsFetcher: null,
 }
 
 const mutations: MutationTree<AppInfo> = {
@@ -108,6 +109,9 @@ const mutations: MutationTree<AppInfo> = {
   SET_NETWORK_MANAGER(state: AppInfo, networkManager: NetworkManager) {
     Vue.set(state, 'networkManager', networkManager)
   },
+  SET_PARTIAL_TRANSACTIONS_FETCHER(state: AppInfo, partialTransactionsFetcher: PartialTransactionsFetcher) {
+    Vue.set(state, 'partialTransactionsFetcher', partialTransactionsFetcher)
+  },
 }
 
 const actions = {
@@ -121,6 +125,7 @@ const actions = {
     commit('SET_NETWORK_PROPERTIES', NetworkProperties.create(store))
     commit('SET_LISTENERS', Listeners.create(store))
     commit('SET_NETWORK_MANAGER', NetworkManager.create(store))
+    commit('SET_PARTIAL_TRANSACTIONS_FETCHER', PartialTransactionsFetcher.create(store))
     await Endpoints.initialize(store)
   },
 }

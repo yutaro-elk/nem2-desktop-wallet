@@ -12,7 +12,6 @@ import {veeValidateConfig} from '@/core/validation'
 import VueRx from 'vue-rx'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   CosignWallet,
 } from '@MOCKS/index'
@@ -45,7 +44,6 @@ describe('ShowMnemonic', () => {
           state: Object.assign(accountState.state, {
             wallet: CosignWallet,
             mosaics,
-            multisigAccountInfo,
             temporaryLoginInfo: {
               password: 'password',
               mnemonic: expectedMnemonic,

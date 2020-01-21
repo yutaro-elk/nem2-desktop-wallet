@@ -1,14 +1,27 @@
 import {Component, Prop, Vue, Watch} from 'vue-property-decorator'
-import {Address, MultisigAccountInfo} from 'nem2-sdk'
-import {mapState} from 'vuex'
+import {Address, MultisigAccountGraphInfo} from 'nem2-sdk'
+import {mapState, mapGetters} from 'vuex'
 import {StoreAccount, AppInfo, AppWallet} from '@/core/model'
+import {flattenArray} from '@/core/utils'
 
-@Component({computed: {...mapState({activeAccount: 'account', app: 'app'})}})
+@Component({
+  computed: {
+    ...mapState({activeAccount: 'account', app: 'app'}),
+    ...mapGetters({
+      isCosignatory: 'isCosignatory',
+      multisigAccountGraphInfo: 'multisigAccountGraphInfo',
+    }),
+  },
+})
 export class SignerSelectorTs extends Vue {
   activeAccount: StoreAccount
   app: AppInfo
+  multisigAccountGraphInfo: MultisigAccountGraphInfo
+  isCosignatory: boolean
 
   @Prop() value: string
+
+  @Prop({default: false}) hideActiveAccount: boolean
 
   get inputValue(): string {
     return this.value
@@ -31,36 +44,37 @@ export class SignerSelectorTs extends Vue {
     return this.activeAccount.wallet
   }
 
-  get multisigInfo(): MultisigAccountInfo {
-    const {address} = this.wallet
-    return this.activeAccount.multisigAccountInfo[address]
-  }
-
   getMultisigAccountLabel(publicKey: string): string {
+    
     const address = Address.createFromPublicKey(publicKey, this.wallet.networkType)
     const walletFromList = this.app.walletList.find(wallet => wallet.address === address.plain())
     if (walletFromList === undefined) return address.pretty()
     return `${address.pretty()} (${walletFromList.name})`
   }
 
-  get hasMultisigAccounts(): boolean {
-    if (!this.multisigInfo) return false
-    return this.multisigInfo.multisigAccounts.length > 0
-  }
+  get multisigPublicKeyList(): Record <string, string> {
+    const {accountPublicKey} = this
+    if (!this.isCosignatory || !this.multisigAccountGraphInfo) return null
+    const {multisigAccounts} = this.multisigAccountGraphInfo
+    const sendersMap = flattenArray(
+      [...multisigAccounts.keys()]
+        .sort() // Level closer to parent first
+        .map(key => multisigAccounts.get(key))
+        .map(multisigAccountInfo => multisigAccountInfo
+          .map(({account}) => ({
+            publicKey: account.publicKey,
+            label: this.getMultisigAccountLabel(account.publicKey),
+          }))
+          .filter(({publicKey}) => publicKey !== accountPublicKey),
+        ),
+    ).reduce((acc, {publicKey, label}) => ({...acc, [publicKey]: label}), {})
 
-  get multisigPublicKeyList(): {publicKey: string, label: string}[] {
-    if (!this.hasMultisigAccounts) return null
-    return [
-      {
-        publicKey: this.accountPublicKey,
-        label: this.getMultisigAccountLabel(this.accountPublicKey),
-      },
-      ...this.multisigInfo.multisigAccounts
-        .map(({publicKey}) => ({
-          publicKey,
-          label: this.getMultisigAccountLabel(publicKey),
-        })),
-    ]
+    return this.hideActiveAccount
+      ? sendersMap
+      : {
+        ...{[accountPublicKey]: this.getMultisigAccountLabel(accountPublicKey)},
+        ...sendersMap,
+      }
   }
 
   @Watch('wallet', {deep: true, immediate: true})

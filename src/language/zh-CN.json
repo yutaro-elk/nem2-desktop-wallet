@@ -200,7 +200,7 @@
   "divisibility_can_not_less_than_0": "可分性不可小于零",
   "duration_can_not_less_than_0": "持续时间不可小于零",
   "fee_can_not_less_than_0": "费用不可小于零",
-  "duration_can_not_more_than_10_years": "持续时间不可大于10年",
+  "mosaic_max_duration_error": "持续时间不可大于{MAX_MOSAIC_DURATION_YEARS}年",
   "duration_can_not_more_than_1_years": "持续时间不可大于1年",
   "modify_supply": "修改供应量",
   "binding_alias": "绑定别名",
@@ -637,7 +637,7 @@
   "Control": "控制权",
   "unbind_alias": "解绑别名",
   "Restrictable": "限制性",
-  "Please_enter_mosaic_hex_or_alias": "请输入马赛克hex或@马赛克别名（@nem.xem）",
+  "Please_enter_mosaic_hex_or_alias": "请输入马赛克hex或@马赛克别名（@alice.coin）",
   "mosaic_alias_not_exist": "马赛克别名不存在",
   "Please_select_public_key": "请选择账户公钥",
   "public": "公钥",
@@ -944,6 +944,7 @@
   "Access_My_Wallet": "接入我的钱包",
   "confirm_information_before_add_child_wallet": "请输入密码以创建子钱包",
   "loading": "处理中...",
-  "Enter_your_password_to_create_a_link_transaction": "输入密码以发布远程链接交易"
+  "Enter_your_password_to_create_a_link_transaction": "输入密码以发布远程链接交易",
+  "Creation_failed":"创建失败"
 
 }

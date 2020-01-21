@@ -5,7 +5,7 @@ import {
   Deadline,
   PlainMessage,
 } from 'nem2-sdk'
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {DEFAULT_FEES, FEE_GROUPS, formDataConfig} from '@/config'
 import {Component, Provide, Vue, Watch} from 'vue-property-decorator'
 import {getAbsoluteMosaicAmount, getRelativeMosaicAmount, formatAddress, cloneData} from '@/core/utils'
@@ -33,19 +33,31 @@ import NumberFormatting from '@/components/number-formatting/NumberFormatting.vu
       activeAccount: 'account',
       app: 'app',
     }),
+    ...mapGetters({
+      multisigAccountInfo: 'multisigAccountInfo',
+      activeMultisigAccountMultisigAccountInfo: 'activeMultisigAccountMultisigAccountInfo',
+      isCosignatory: 'isCosignatory',
+      announceInLock: 'announceInLock',
+    }),
   },
 })
 export class TransferTs extends Vue {
+  c = 1
+
   @Provide() validator: any = this.$validator
   activeAccount: StoreAccount
   app: AppInfo
+  multisigAccountInfo: MultisigAccountInfo
+  activeMultisigAccountMultisigAccountInfo: MultisigAccountInfo
+  isCosignatory: boolean
+  announceInLock: boolean
   isShowPanel = true
   transactionList = []
   transactionDetail = {}
   isShowSubAlias = false
   currentCosignatoryList = []
   selectedMosaicHex = ''
-  currentAmount: number = null
+  currentAmount = 0
   isAddressMapNull = true
   formItems = cloneData(formDataConfig.transferForm)
   validation = validation
@@ -57,16 +69,6 @@ export class TransferTs extends Vue {
     const {mosaics, selectedMosaicHex} = this
     if (!mosaics || !selectedMosaicHex) return null
     return mosaics[selectedMosaicHex] || null
-  }
-
-  get announceInLock(): boolean {
-    const {activeMultisigAccount, networkType} = this
-    if (!this.activeMultisigAccount) return false
-    const address = Address.createFromPublicKey(activeMultisigAccount, networkType).plain()
-    // @TODO: Do a loading system
-    const multisigInfo = this.activeAccount.multisigAccountInfo[address]
-    if (!multisigInfo) return false
-    return multisigInfo.minApproval > 1
   }
 
   get defaultFees(): DefaultFee[] {
@@ -111,16 +113,6 @@ export class TransferTs extends Vue {
     const {multisigAccountsMosaics} = this.activeAccount
     if (!activeMultisigAccountAddress) return {}
     return multisigAccountsMosaics[activeMultisigAccountAddress] || {}
-  }
-
-  get multisigInfo(): MultisigAccountInfo {
-    const {address} = this.wallet
-    return this.activeAccount.multisigAccountInfo[address]
-  }
-
-  get hasMultisigAccounts(): boolean {
-    if (!this.multisigInfo) return false
-    return this.multisigInfo.multisigAccounts.length > 0
   }
 
   get wallet(): AppWallet {
@@ -184,8 +176,8 @@ export class TransferTs extends Vue {
   }
 
   initForm() {
-    this.selectedMosaicHex = null
-    this.currentAmount = null
+    this.selectedMosaicHex = this.mosaicList[0] ? this.mosaicList[0].value : null
+    this.currentAmount = 0
     this.formItems = cloneData(formDataConfig.transferForm)
     this.formItems.multisigPublicKey = this.wallet.publicKey
     this.resetFields()
@@ -322,13 +314,8 @@ export class TransferTs extends Vue {
     }
   }
 
-  @Watch('selectedMosaicHex', {immediate: true})
-  onSelectedMosaicHexChange() {
-    /** Makes currentAmount validation reactive */
-    this.$validator.validate('currentAmount', this.currentAmount).catch(e => e)
-  }
-
-  async mounted() {
+  mounted() {
     this.initForm()
   }
+
 }

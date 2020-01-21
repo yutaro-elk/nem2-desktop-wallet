@@ -1,8 +1,9 @@
 import {MosaicId, Account, Address, NetworkType} from 'nem2-sdk'
-import {networkConfig} from '@/config/constants'
+import {defaultNetworkConfig, networkConfig} from '@/config/constants'
 import {getAbsoluteMosaicAmount, localRead} from '@/core/utils'
-import {AppAccounts, ValidationObject, AppWallet, CurrentAccount, AppMosaic} from '@/core/model'
+import {AppAccounts, ValidationObject, AppWallet, CurrentAccount, AppMosaic, HdWallet} from '@/core/model'
 import {validateAddress, validatePublicKey, validateAlias, validateMosaicId, validateNamespace} from './validators'
+import {MnemonicPassPhrase} from 'nem2-hd-wallets'
 
 const {PUBLIC_KEY_LENGTH, maxMosaicAtomicUnits} = networkConfig
 
@@ -32,7 +33,26 @@ export const CUSTOM_VALIDATORS_NAMES = {
   publicKey: 'publicKey',
   remoteAccountPrivateKey: 'remoteAccountPrivateKey',
   newAccountName:'newAccountName',
+  mnemonicCheck:'mnemonicCheck',
 }
+
+const mnemonicCheckValidator = (context): Promise<ValidationObject> => {
+  return context.Validator.extend(
+    CUSTOM_VALIDATORS_NAMES.mnemonicCheck,
+    (mnemonics) => new Promise((resolve) => {
+      try {
+        const wordsInMnemonics = mnemonics.split(' ').length
+        if(wordsInMnemonics == 12 || wordsInMnemonics == 24) {
+          resolve({valid: new MnemonicPassPhrase(mnemonics).isValid()})
+        }
+        resolve({valid: false})
+      } catch (error) {
+        resolve({valid: false})
+      }
+    }),
+  )
+}
+
 const newAccountNameValidator = (context): Promise<ValidationObject> => {
   return context.Validator.extend(
     CUSTOM_VALIDATORS_NAMES.newAccountName,
@@ -272,9 +292,9 @@ const mosaicAmountValidator = (context): Promise<ValidationObject> => {
     (amount, [otherField]) => new Promise((resolve) => {
       try {
         const appMosaic: AppMosaic = getOtherFieldValue(otherField, context)
-        const absoluteAmount = getAbsoluteMosaicAmount(amount, appMosaic.properties.divisibility)
-        if (isNaN(absoluteAmount)) resolve({valid: false})
-        if (absoluteAmount > maxMosaicAtomicUnits) resolve({valid: false})
+        const maxAmount = appMosaic.balance
+        if (isNaN(amount)) resolve({valid: false})
+        if (amount > maxAmount) resolve({valid: false})
         resolve({valid: true})
       } catch (error) {
         resolve({valid: false})
@@ -315,6 +335,7 @@ const customValidatorFactory = {
   [CUSTOM_VALIDATORS_NAMES.publicKey]: publicKeyValidator,
   [CUSTOM_VALIDATORS_NAMES.remoteAccountPrivateKey]: remoteAccountPrivateKeyValidator,
   [CUSTOM_VALIDATORS_NAMES.newAccountName]: newAccountNameValidator,
+  [CUSTOM_VALIDATORS_NAMES.mnemonicCheck]: mnemonicCheckValidator,
 }
 
 const CustomValidator = (name, Validator) => ({

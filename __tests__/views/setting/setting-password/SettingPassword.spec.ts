@@ -12,7 +12,6 @@ import VueRx from 'vue-rx'
 import flushPromises from 'flush-promises'
 import {
   mosaicsLoading,
-  multisigAccountInfo,
   mosaics,
   hdAccount,
   hdAccountData,
@@ -43,7 +42,6 @@ describe('SettingPassword', () => {
         account: {
           state: Object.assign(accountState.state, {
             mosaics,
-            multisigAccountInfo,
             wallet: AppWallet.createFromDTO(hdAccount.wallets[0]),
             currentAccount: new CurrentAccount(hdAccount.accountName, hdAccount.password, hdAccount.networkType),
           }),

@@ -1,146 +1,28 @@
-import {of, throwError} from 'rxjs'
-import {tap, map, mapTo, switchMap, catchError} from 'rxjs/operators'
 import {UInt64} from 'nem2-sdk'
 import {NetworkProperties} from '@/core/model/NetworkProperties.ts'
-import {BlockHttp} from 'nem2-sdk/dist/src/infrastructure/BlockHttp'
-import {ChainHttp} from 'nem2-sdk/dist/src/infrastructure/ChainHttp'
-import {Notice} from '@/core/model'
 import {networkConfig} from '@/config'
-import {firstTransactionsNemXem, xemNamespace} from '../../../__mocks__/network/firstTransactionsNemXem'
-import {firstTransactionsCatCurrency, catNamespace} from '../../../__mocks__/network/firstTransactionsCatCurrency'
 import {block29248} from '../../../__mocks__/network/block29248'
 import {block1} from '../../../__mocks__/network/block1'
-import {OnWalletChange} from '@/core/services/eventHandlers/onWalletChange'
-import {setWalletsBalances} from '@/core/services/wallets/setWalletsBalances'
 
 const {maxDifficultyBlocks, defaultDynamicFeeMultiplier} = networkConfig
 
 jest.mock('@/core/model/Notice')
 jest.mock('@/core/services/eventHandlers/onWalletChange')
-jest.mock('@/core/services/wallets/setWalletsBalances')
 
 const mockDispatch = jest.fn()
-const mockTriggerNotice = jest.fn()
-const mockGetBlockByHeightCall = jest.fn()
-const mockGetBlockTransactionsCall = jest.fn()
-const mockGetBlockByHeightWithLimitCall = jest.fn()
-Notice.trigger = mockTriggerNotice
-
-
-const mockGetBlockByHeight = blockNumber => of(blockNumber).pipe(
-  tap(blockNumber => mockGetBlockByHeightCall(blockNumber)),
-  switchMap(blockNumber => {
-    if (blockNumber === '29248') return of(block29248)
-    return of(block1)
-  }),
-)
-
-const mockGetBlockByHeightWithLimit = blockNumber => of(blockNumber).pipe(
-  tap(blockNumber => mockGetBlockByHeightWithLimitCall(blockNumber)),
-  switchMap(blockNumber => {
-    if (blockNumber === '29248') return of([block29248])
-    return of(block1)
-  }),
-)
-
-const mockGetBlockTransactions = (...args) => of(args).pipe(
-  tap(args => mockGetBlockTransactionsCall(args)),
-  mapTo((firstTransactionsNemXem)),
-)
-
-const mockGetBlockTransactionsCatCurrency = (...args) => of(args).pipe(
-  tap(args => mockGetBlockTransactionsCall(args)),
-  mapTo((firstTransactionsCatCurrency)),
-)
-
-const mockNamespace = (...args) => of(args).pipe(
-  mapTo(xemNamespace),
-)
-
-const mockCatNamespace = (...args) => of(args).pipe(
-  mapTo(catNamespace),
-)
-
-const mockGetBlockchainHeight = () => of('mock').pipe(
-  mapTo(UInt64.fromUint(29248)),
-)
-
-const mockEmptyBlockHttp = () => of('mock').pipe(
-  map(() => {throw new Error('Couldn\'t get the network first block')}),
-  catchError(error => throwError(error)),
-)
-
-const mockEmptyResponse = () => of('mock').pipe(
-  mapTo(({})),
-)
-
-const mockListeners = jest.fn().mockImplementation()
 const mockNetworkPropertiesSetLoadingTrue = jest.fn()
 const mockNetworkPropertiesReset = jest.fn()
 const mockNetworkPropertiesSetValuesFromFirstBlock = jest.fn()
 const mockNetworkPropertiesSetValuesFromLatestBlocks = jest.fn()
 
-jest.mock('nem2-sdk/dist/src/infrastructure/BlockHttp', () => ({
-  BlockHttp: jest.fn().mockImplementation(endpoint => {
-    if (endpoint === 'http://errored.endpoint:3000') {
-      return {
-        getBlockByHeight: mockEmptyBlockHttp,
-        getBlocksByHeightWithLimit: mockGetBlockByHeightWithLimit,
-        getBlockTransactions: mockEmptyResponse,
-      }
-    } else if (endpoint === 'http://cat.currency:3000') {
-      return {
-        getBlockByHeight: mockGetBlockByHeight,
-        getBlocksByHeightWithLimit: mockGetBlockByHeightWithLimit,
-        getBlockTransactions: mockGetBlockTransactionsCatCurrency,
-      }
-    }
-    return {
-      getBlockByHeight: mockGetBlockByHeight,
-      getBlocksByHeightWithLimit: mockGetBlockByHeightWithLimit,
-      getBlockTransactions: mockGetBlockTransactions,
-    }
-  }),
-}))
-
-jest.mock('nem2-sdk/dist/src/infrastructure/ChainHttp', () => ({
-  ChainHttp: jest.fn().mockImplementation(endpoint => {
-    if (endpoint === 'http://errored.endpoint:3000') {
-      return {getBlockchainHeight: mockEmptyResponse}
-    }
-    return {getBlockchainHeight: mockGetBlockchainHeight}
-  }),
-}))
-
-jest.mock('nem2-sdk/dist/src/service/NamespaceService', () => ({
-  NamespaceService: jest.fn().mockImplementation(namespaceHttp => {
-    const endpoint = namespaceHttp.namespaceRoutesApi._basePath
-    if (endpoint === 'http://cat.currency:3000') {
-      return {namespace: mockCatNamespace}
-    }
-    return {namespace: mockNamespace}
-  }),
-}))
 
 describe('Network properties', () => {
   beforeEach(() => {
-    // @ts-ignore
-    BlockHttp.mockClear()
-    // @ts-ignore
-    ChainHttp.mockClear()
-    // @ts-ignore
-    mockTriggerNotice.mockClear()
-    mockGetBlockByHeightCall.mockClear()
     mockDispatch.mockClear()
-    mockListeners.mockClear()
     mockNetworkPropertiesSetLoadingTrue.mockClear()
     mockNetworkPropertiesReset.mockClear()
     mockNetworkPropertiesSetValuesFromFirstBlock.mockClear()
     mockNetworkPropertiesSetValuesFromLatestBlocks.mockClear()
-    // @ts-ignore
-    OnWalletChange.mockClear()
-    // @ts-ignore
-    setWalletsBalances.mockClear()
   })
 
   const store = {dispatch: mockDispatch}
