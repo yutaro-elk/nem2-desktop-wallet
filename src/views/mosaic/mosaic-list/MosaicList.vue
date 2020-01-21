@@ -11,7 +11,7 @@
       </div>
       <div class="mosaicListBody">
         <div class="listTit">
-          <span class="balance" @click="getSortType(mosaicSortType.byBalance)">
+          <span class="balance overflow_ellipsis" @click="getSortType(mosaicSortType.byBalance)">
             {{ $t('my_balance') }}
             <Icon
               v-if="mosaicSortType.byBalance === currentSortType" class="active_sort_type"
@@ -19,7 +19,7 @@
             />
           </span>
 
-          <span class="mosaic_id" @click="getSortType(mosaicSortType.byId)">
+          <span class="mosaic_id overflow_ellipsis" @click="getSortType(mosaicSortType.byId)">
             {{ $t('mosaic_ID') }}
             <Icon
               v-if="mosaicSortType.byId === currentSortType" class="active_sort_type"
@@ -27,7 +27,7 @@
             />
           </span>
 
-          <span class="available_quantity" @click="getSortType(mosaicSortType.bySupply)">
+          <span class="available_quantity overflow_ellipsis" @click="getSortType(mosaicSortType.bySupply)">
             {{ $t('available_quantity') }}
             <Icon
               v-if="mosaicSortType.bySupply === currentSortType" class="active_sort_type"
@@ -35,7 +35,7 @@
             />
           </span>
 
-          <span class="mosaic_divisibility" @click="getSortType(mosaicSortType.byDivisibility)">
+          <span class="mosaic_divisibility overflow_ellipsis" @click="getSortType(mosaicSortType.byDivisibility)">
             {{ $t('mosaic_divisibility') }}
             <Icon
               v-if="mosaicSortType.byDivisibility === currentSortType" class="active_sort_type"
@@ -43,7 +43,7 @@
             />
           </span>
 
-          <span class="transportability" @click="getSortType(mosaicSortType.byTransferable)">
+          <span class="transportability overflow_ellipsis" @click="getSortType(mosaicSortType.byTransferable)">
 
             {{ $t('transportability') }}
             <Icon
@@ -53,7 +53,7 @@
 
           </span>
 
-          <span class="variable_supply" @click="getSortType(mosaicSortType.bySupplyMutable)">
+          <span class="variable_supply overflow_ellipsis" @click="getSortType(mosaicSortType.bySupplyMutable)">
             {{ $t('variable_supply') }}
             <Icon
               v-if="mosaicSortType.bySupplyMutable === currentSortType" class="active_sort_type"
@@ -61,7 +61,7 @@
             />
           </span>
 
-          <span class="Restrictable" @click="getSortType(mosaicSortType.byRestrictable)">
+          <span class="Restrictable overflow_ellipsis" @click="getSortType(mosaicSortType.byRestrictable)">
             {{ $t('Restrictable') }}
             <Icon
               v-if="mosaicSortType.byRestrictable === currentSortType" class="active_sort_type"
@@ -69,7 +69,7 @@
             />
           </span>
 
-          <span class="deadline" @click="getSortType(mosaicSortType.byDuration)">
+          <span class="deadline overflow_ellipsis" @click="getSortType(mosaicSortType.byDuration)">
             {{ $t('deadline') }}
             <Icon
               v-if="mosaicSortType.byDuration === currentSortType" class="active_sort_type"
@@ -77,7 +77,7 @@
             />
           </span>
 
-          <span class="alias" @click="getSortType(mosaicSortType.byAlias)">
+          <span class="alias overflow_ellipsis" @click="getSortType(mosaicSortType.byAlias)">
             {{ $t('alias') }}
             <Icon
               v-if="mosaicSortType.byAlias === currentSortType" class="active_sort_type"
@@ -87,7 +87,7 @@
 
 
           <span
-            class="pointer refresh_btn"
+            class="pointer refresh_btn overflow_ellipsis"
             @click="refreshMosaicList()"
           >{{ $t('refresh') }}</span>
           <div class="mosaic_filter pointer" @click="toggleIsShowExpiredMosaic()">
