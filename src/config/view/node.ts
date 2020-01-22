@@ -3,33 +3,33 @@ import {NetworkType} from 'nem2-sdk'
 
 export const defaultNodeList: Endpoint[] = [
   {
-    value: 'http://api-harvest-20.ap-northeast-1.nemtech.network:3000',
+    value: 'http://api-xym-harvest-20.ap-northeast-1.nemtech.network:3000',
     name: 'ap-northeast-1',
-    url: 'api-harvest-20.ap-northeast-1.nemtech.network',
+    url: 'api-xym-harvest-20.ap-northeast-1.nemtech.network',
     networkType:NetworkType.TEST_NET,
   },
   {
-    value: 'http://api-harvest-20.ap-southeast-1.nemtech.network:3000',
+    value: 'http://api-xym-harvest-20.ap-southeast-1.nemtech.network:3000',
     name: 'ap-southeast-1',
-    url: 'api-harvest-20.ap-southeast-1.nemtech.network',
+    url: 'api-xym-harvest-20.ap-southeast-1.nemtech.network',
     networkType:NetworkType.TEST_NET,
   },
   {
-    value: 'http://api-harvest-20.eu-west-1.nemtech.network:3000',
+    value: 'http://api-xym-harvest-20.eu-west-1.nemtech.network:3000',
     name: 'eu-west-1',
-    url: 'api-harvest-20.eu-west-1.nemtech.network',
+    url: 'api-xym-harvest-20.eu-west-1.nemtech.network',
     networkType:NetworkType.TEST_NET,
   },
   {
-    value: 'http://api-harvest-20.us-west-1.nemtech.network:3000',
+    value: 'http://api-xym-harvest-20.us-west-1.nemtech.network:3000',
     name: 'us-west-1',
-    url: 'api-harvest-20.us-west-1.nemtech.network',
+    url: 'api-xym-harvest-20.us-west-1.nemtech.network',
     networkType:NetworkType.TEST_NET,
   },
   {
-    value: 'http://api-20.us-west-1.nemtech.network:3000',
+    value: 'http://api-xym-20.us-west-1.nemtech.network:3000',
     name: 'us-west-1',
-    url: 'api-20.us-west-1.nemtech.network',
+    url: 'api-xym-20.us-west-1.nemtech.network',
     networkType:NetworkType.TEST_NET,
 
   },
