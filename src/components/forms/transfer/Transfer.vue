@@ -1,6 +1,6 @@
 <template>
   <div class="transfer" @click="isShowSubAlias = false">
-    <form @submit.prevent="validateForm('transfer-transaction')" @keyup.enter="submit">
+    <form action="submit" onsubmit="event.preventDefault()" @keyup.enter="submit">
       <div v-if="!isCosignatory" class="flex_center">
         <span class="title">{{ $t('sender') }}</span>
         <span class="value no-border">{{ formatAddress(wallet.address) }}</span>
@@ -9,7 +9,10 @@
       <div v-if="isCosignatory" class="address flex_center">
         <span class="title">{{ $t('sender') }}</span>
         <span class="value radius flex_center">
-          <SignerSelector v-model="formItems.multisigPublicKey" />
+          <SignerSelector
+            v-model="formItems.multisigPublicKey"
+            @input="resetMosaicFieldsAndValidation()"
+          />
         </span>
       </div>
 
@@ -38,11 +41,11 @@
               <Select
                 v-model="selectedMosaicHex"
                 v-validate
-                @on-change="$validator.validate('currentAmount', currentAmount).catch(e => e)"
                 :data-vv-as="$t('asset_type')"
                 :placeholder="$t('asset_type')"
                 class="asset_type"
                 data-vv-name="selectedMosaicHex"
+                @on-change="$validator.validate('currentAmount', currentAmount).catch(e => e)"
               >
                 <Option
                   v-for="item in mosaicList"
@@ -54,7 +57,7 @@
             <span class="amount value radius flex_center">
               <ErrorTooltip field-name="currentAmount" placement-override="top" class="amountTooltip">
                 <input
-                  v-model.number="currentAmount"
+                  v-model="currentAmount"
                   v-validate="validation.amount"
                   :placeholder="$t('please_enter_the_transfer_amount')"
                   :data-vv-as="$t('amount')"

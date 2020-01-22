@@ -42,8 +42,6 @@ import NumberFormatting from '@/components/number-formatting/NumberFormatting.vu
   },
 })
 export class TransferTs extends Vue {
-  c = 1
-
   @Provide() validator: any = this.$validator
   activeAccount: StoreAccount
   app: AppInfo
@@ -68,6 +66,7 @@ export class TransferTs extends Vue {
   get selectedMosaic() {
     const {mosaics, selectedMosaicHex} = this
     if (!mosaics || !selectedMosaicHex) return null
+    if (this.isSelectedAccountMultisig) return this.multisigMosaicList[selectedMosaicHex] || null
     return mosaics[selectedMosaicHex] || null
   }
 
@@ -175,13 +174,6 @@ export class TransferTs extends Vue {
     return new LockParams(announceInLock, feeAmount / feeDivider)
   }
 
-  initForm() {
-    this.selectedMosaicHex = this.mosaicList[0] ? this.mosaicList[0].value : null
-    this.currentAmount = 0
-    this.formItems = cloneData(formDataConfig.transferForm)
-    this.formItems.multisigPublicKey = this.wallet.publicKey
-    this.resetFields()
-  }
 
   addMosaic() {
     const {selectedMosaicHex, mosaics, currentAmount} = this
@@ -302,10 +294,6 @@ export class TransferTs extends Vue {
     this.transactionList = [aggregateTransaction]
   }
 
-  resetFields() {
-    this.$nextTick(() => this.$validator.reset())
-  }
-
   @Watch('wallet', {deep: true})
   onWalletChange(newVal, oldVal) {
     if (!newVal.publicKey) return
@@ -318,4 +306,30 @@ export class TransferTs extends Vue {
     this.initForm()
   }
 
+  initForm() {
+    this.resetFields()
+    this.setDefaultPublicKey()
+    this.resetValidation()
+  }
+
+  resetFields() {
+    this.selectedMosaicHex = this.mosaicList[0] ? this.mosaicList[0].value : null
+    this.currentAmount = null
+    this.formItems = cloneData(formDataConfig.transferForm)
+  }
+
+  setDefaultPublicKey() {
+    this.formItems.multisigPublicKey = this.wallet.publicKey
+  }
+
+  resetMosaicFieldsAndValidation() {
+    this.currentAmount = null
+    this.selectedMosaicHex = this.mosaicList[0] ? this.mosaicList[0].value : null
+    this.formItems.mosaicTransferList = []
+    this.resetValidation()
+  }
+  
+  resetValidation() {
+    this.$nextTick(() => this.$validator.reset())
+  }
 }
